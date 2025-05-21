@@ -4,6 +4,12 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
+interface AlertDialogContentProps
+  extends React.ComponentProps<typeof AlertDialogPrimitive.Content> {
+  contentClassName?: string
+  style?: React.CSSProperties
+}
+
 function AlertDialog({
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
@@ -44,8 +50,10 @@ function AlertDialogOverlay({
 
 function AlertDialogContent({
   className,
+  contentClassName,
+  style,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
+}: AlertDialogContentProps) {
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
@@ -53,9 +61,10 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         className={cn(
           "bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-200 translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200",
+          contentClassName, // <- ahora sí se aplica
           className
         )}
-
+        style={style} // <- se aplica el estilo personalizado
         {...props}
       />
     </AlertDialogPortal>

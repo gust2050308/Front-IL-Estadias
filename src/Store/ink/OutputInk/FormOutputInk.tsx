@@ -61,7 +61,7 @@ export default function FormOutputInk() {
         <div className="w-full flex flex-row items-center justify-center">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-                    <div className="flex flex-row items-center justify-between">    
+                    <div className="flex flex-row items-center justify-between">
                         <FormField
                             control={form.control}
                             name="select"
@@ -132,18 +132,18 @@ export default function FormOutputInk() {
                         />
                         <div className="mt-4">
                             <FormField
-                            control={form.control}
-                            name="whoReceives"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Quién recibe</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="¿Quien recibe?" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                control={form.control}
+                                name="whoReceives"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Quién recibe</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="¿Quien recibe?" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                     </div>
                     <Button type="submit" className="bg-blue-600">Hecho</Button>
