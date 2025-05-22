@@ -28,8 +28,8 @@ interface InventoryItem {
     purchaseOrderNumber: string; // Número de orden de compra
     type: string; // Tipo de producto
     code: string; // Código del producto
-    units: number; // Unidades
-    quantityKilograms: number; // Cantidad en kilogramos
+    units: any; // Unidades
+    quantityKilograms: any; // Cantidad en kilogramos
     batchProvider: string; // Lote del proveedor
     internalBatch: string; // Lote interno
     qualityCertificate: string; // Certificado de calidad
@@ -44,8 +44,8 @@ export default function NewEntries() {
         purchaseOrderNumber: '',
         type: '',
         code: '',
-        units: 0,
-        quantityKilograms: 0,
+        units: '',
+        quantityKilograms: '',
         batchProvider: '',
         internalBatch: '',
         qualityCertificate: ''
@@ -181,7 +181,7 @@ export default function NewEntries() {
 
     return (
         <div>
-             <div style={{ marginLeft: -85, marginTop: 50, maxHeight: '600px', overflowY: 'auto' }}>
+             <div style={{ marginLeft: -85, marginTop: 50,  }}>
             <div className="rounded-md border" style={{ maxHeight: '600', overflowY: "auto" }}>
                 <Table>
                     <TableHeader>
@@ -273,6 +273,7 @@ export default function NewEntries() {
                                     <Input
                                         type="number"
                                         value={item.units}
+                                        placeholder="0"
                                         onChange={(e) => handleChange(index, 'units', e.target.value)}
                                         className="w-16 h-full p-2 bg-transparent outline-none"
                                     />
@@ -281,6 +282,7 @@ export default function NewEntries() {
                                     <Input
                                         type="number"
                                         value={item.quantityKilograms}
+                                        placeholder="0"
                                         onChange={(e) => handleChange(index, 'quantityKilograms', e.target.value)}
                                         className="w-16 h-full p-2 bg-transparent outline-none"
                                     />
@@ -390,6 +392,5 @@ export default function NewEntries() {
                 </Button>
             </div>
         </div>
-       
     )
 }

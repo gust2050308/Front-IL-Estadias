@@ -15,6 +15,8 @@ import { CalendarIcon } from "lucide-react"
 
 import { format } from "date-fns"
 
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+
 const url = import.meta.env.VITE_API_URL
 
 import {
@@ -61,8 +63,56 @@ function onSubmit(values: z.infer<typeof formSchema>) {
   console.log(values)
 }
 
+interface PapersItemsModel {
+  unitsQuantity: number; // Unidades
+  codeItem: string; // 
+  paperWidthMM: number; // 
+  paperlengthM: number; // 
+}
+
 export default function PapersItemsData() {
   const [providers, setProviders] = useState<any[]>([])
+
+  const [items, setItems] = useState<PapersItemsModel[]>([
+    {
+      unitsQuantity: 0,
+      codeItem: '',
+      paperWidthMM: 0,
+      paperlengthM: 0,
+    },
+  ]);
+
+  const handleChange = (index: number, field: keyof PapersItemsModel, value: string) => {
+    const newItems = [...items];
+
+    switch (field) {
+      case 'unitsQuantity':
+        newItems[index].unitsQuantity = parseInt(value);
+        break;
+      case 'codeItem':
+        newItems[index].codeItem = value;
+        break;
+      case 'paperWidthMM':
+        newItems[index].paperWidthMM = parseInt(value);
+        break;
+      case 'paperlengthM':
+        newItems[index].paperlengthM = parseInt(value);
+        break;
+      default:
+        break;
+    }
+     setItems(newItems);
+  }
+
+  const handleAddRow = () => {
+    setItems([...items, { unitsQuantity: 0, codeItem: '', paperWidthMM: 0, paperlengthM: 0 }]);
+  };
+
+  const handleDeleteRow = (index: number) => {
+    const newItems = [...items];
+    newItems.splice(index, 1);
+    setItems(newItems);
+  };
 
   async function getProviders() {
     try {
@@ -109,7 +159,7 @@ export default function PapersItemsData() {
 
 
   return (
-    <div className=" w-270">
+    <div className=" w-270" style={{maxHeight: '450px', overflowY: 'auto'}}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <div className="w-full" style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'space-between' }}>
@@ -212,7 +262,7 @@ export default function PapersItemsData() {
                             }
                           }}
                           disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
+                            date < new Date(new Date().setHours(0, 0, 0, 0))
                           }
                           initialFocus
                         />
@@ -251,7 +301,7 @@ export default function PapersItemsData() {
               </FormItem>
             )}
           />
-           <div className="flex flex-row justify-between">
+          <div className="flex flex-row justify-between">
             <FormField
               control={form.control}
               name="providers"
@@ -277,7 +327,6 @@ export default function PapersItemsData() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="deliveryPlace"
@@ -291,12 +340,78 @@ export default function PapersItemsData() {
                 </FormItem>
               )}
             />
-
+          </div>
+          <div>
+            <div className="flex flex-row justify-between">
+              <h1 className="text-lg leading-none font-semibold ml-2.5">Items</h1>
+              <Button
+                onClick={handleAddRow}
+                className="bg-blue-500 text-white px-4 py-2 rounded mr-2 hover:bg-blue-600"
+              >
+                Agregar Ítem
+              </Button>
+            </div>
+            <div className="rounded-md border mt-2" style={{ maxHeight: '600', overflowY: "auto" }}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Cantidad</TableHead>
+                    <TableHead>Código</TableHead>
+                    <TableHead>Ancho(mm)</TableHead>
+                    <TableHead>Largo(m)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className='w-32'
+                          value={item.unitsQuantity}
+                          onChange={(e) => handleChange(index, 'unitsQuantity', e.target.value)} />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className='w-32'
+                          value={item.codeItem}
+                          onChange={(e) => handleChange(index, 'codeItem', e.target.value)} />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className='w-32'
+                          value={item.paperWidthMM}
+                          onChange={(e) => handleChange(index, 'paperWidthMM', e.target.value)} />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          className='w-32'
+                          value={item.paperlengthM}
+                          onChange={(e) => handleChange(index, 'paperlengthM', e.target.value)} />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          onClick={() => handleDeleteRow(index)}
+                          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                          Eliminar
+                        </Button>
+                      </TableCell>
+                      <TableCell></TableCell>
+                    </TableRow>))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
           <Button type="submit" className="bg-blue-600">Hecho</Button>
         </form>
       </Form>
-
     </div>
   )
 }

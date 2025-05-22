@@ -7,8 +7,6 @@ import InkItemsData from "./InkItemsData"
 
 export default function FormOutputInk() {
 
-
-
     return (
         <div className="w-full flex flex-row items-start p-2">
 

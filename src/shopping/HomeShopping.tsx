@@ -44,7 +44,6 @@ export default function HomeShopping() {
                     </div>
                 </DialogContent>
             </Dialog>
-        
         </div>
     )
 }
