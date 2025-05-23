@@ -5,6 +5,9 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "jsx": "react-jsx", // o "react" si usas React <17
+    "allowJs": true,    // necesario para aceptar archivos .js/.jsx
+    "checkJs": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

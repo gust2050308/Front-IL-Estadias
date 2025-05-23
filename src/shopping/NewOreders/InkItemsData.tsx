@@ -172,9 +172,9 @@ export default function InkItemsData() {
 
       const response = await axios.post(`${url}/PurchaseOrder`, payload);
       if (response.status === 201) {
-        alert("Orden enviada correctamente.");
-        navigate('/homeShopping');
-        console.log("Respuesta del servidor:", response.data);
+        console.log('Antes de navegar');
+        navigate('/HomeShopping', { replace: true }); // Reemplaza la entrada en el historial
+        console.log('Después de navegar');
         alert("Orden enviada correctamente.");
 
         form.reset();
