@@ -4,7 +4,8 @@ import PaperActions from './paper/PaperActions';
 
 export default function AlmacenHome() {
     return (
-        <div>
+        <div className=' flex flex-col items-center justify-center h-full w-full'>
+            <div className="w-350">
             <Tabs defaultValue="Ink" className='w300'>
                 <TabsList>
                     <TabsTrigger value="Ink">Tinta</TabsTrigger>
@@ -18,5 +19,8 @@ export default function AlmacenHome() {
                 </TabsContent>
             </Tabs>
         </div>
+        </div>
+
+        
     )
 }

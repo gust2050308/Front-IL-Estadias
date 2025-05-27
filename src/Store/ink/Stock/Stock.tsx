@@ -36,7 +36,7 @@ export default function DemoPage() {
 
 
     return (
-        <div className="container mx-auto py-10">
+        <div className="container mt-2 h-150">
             <DataTable columns={columns} data={data} />
         </div>
     )

@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -12,12 +12,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { CalendarIcon } from "lucide-react"
-import { useNavigate } from 'react-router-dom';
-
+import { toast } from "sonner"
 import { format } from "date-fns"
 
 const url = import.meta.env.VITE_API_URL
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+
+import { useContext } from "react"
+
+import { GeneralDataContext } from "./GeneralDataContext"
 
 import {
   Select,
@@ -48,7 +51,7 @@ const DeliverPlaces = ['Galeana No. 45, Col. Acapantzingo, Cuernavaca, Morelos, 
 
 const formSchema = z.object({
   select: z.string().min(1, { message: 'Selecciona una producción' }),
-  orderNumber: z.coerce.number().min(1, { message: "Debe ser de al menos 4 digitos" }),
+  orderNumber: z.coerce.number().min(1000, { message: "Debe ser de al menos 4 digitos" }),
   providers: z.coerce.number().min(1, "Debe seleccionar un proveedor"),
   deliveryDateExpected: z.coerce.date({
     required_error: "Se espera una fecha",
@@ -57,55 +60,20 @@ const formSchema = z.object({
   paymentMethod: z.string().min(1, { message: "Este campo es requerido" }),
   shipment: z.string().min(1, { message: "Este campo es requerido" }),
   deliveryPlace: z.string().min(1, { message: "Este campo es requerido" }),
+  inkItems: z.array(
+    z.object(
+      {
+        unitsQuantity: z.number().min(1, { message: 'Al menos una unidad ' }),
+        amountKilograms: z.number().min(1, { message: 'Debe ser mayor a 1' }),
+        codeItem: z.string().min(4, { message: 'Minimo 4 caraceteres' })
+      }
+    )
+  )
 })
 
-interface PapersItemsModel {
-  unitsQuantity: any; //
-  codeItem: string; // 
-  amountKilograms: any; // 
-}
-
 export default function InkItemsData() {
+  const { setOpen } = useContext(GeneralDataContext)
   const [providers, setProviders] = useState<any[]>([])
-
-  const navigate = useNavigate();
-
-  const [items, setItems] = useState<PapersItemsModel[]>([
-    {
-      unitsQuantity: '',
-      codeItem: '',
-      amountKilograms: '',
-    },
-  ]);
-
-  const handleChange = (index: number, field: keyof PapersItemsModel, value: string) => {
-    const newItems = [...items];
-
-    switch (field) {
-      case 'unitsQuantity':
-        newItems[index].unitsQuantity = parseInt(value); // Manejar valores vacíos
-        break;
-      case 'codeItem':
-        newItems[index].codeItem = value;
-        break;
-      case 'amountKilograms':
-        newItems[index].amountKilograms = parseInt(value); // Manejar valores vacíos
-        break;
-      default:
-        break;
-    }
-    setItems(newItems);
-  }
-
-  const handleAddRow = () => {
-    setItems([...items, { unitsQuantity: '', codeItem: '', amountKilograms: '', }]);
-  };
-
-  const handleDeleteRow = (index: number) => {
-    const newItems = [...items];
-    newItems.splice(index, 1);
-    setItems(newItems);
-  };
 
   async function getProviders() {
     try {
@@ -117,7 +85,6 @@ export default function InkItemsData() {
       return []; // Retorna un array vacío en caso de error
     }
   }
-
 
   useEffect(() => {
     async function fetchData() {
@@ -137,19 +104,38 @@ export default function InkItemsData() {
       paymentMethod: '',
       shipment: '',
       deliveryPlace: '',
+      inkItems: [{
+        unitsQuantity: 0,
+        amountKilograms: 0,
+        codeItem: ''
+      }]
     },
-
   })
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  async function deletePurchaseOrder(idOrder: number) {
+    try {
+      const response = await axios.delete(`${url}/PurchaseOrder/${idOrder}`)
+      if (response.status === 200) {
+        toast("Orden ELIMINADA exitosamente", {
+          description: "Se ha eliminado una nueva orden.",
+        })
+      }
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+      alert(`Error al enviar los datos: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    }
+
+  }
+
+
   async function sendDataToApi(formValues: z.infer<typeof formSchema>) {
     try {
-
       const payload = {
         purchaseOrderNumber: formValues.orderNumber,
         provider: {
-          id_Provider: formValues.providers // Usar directamente el ID del formulario
+          id_Provider: formValues.providers
         },
         requestDate: new Date().toISOString(),
         deliveryDateExpected: formValues.deliveryDateExpected.toISOString(),
@@ -158,29 +144,27 @@ export default function InkItemsData() {
         shipment: formValues.shipment,
         deliveryPlace: formValues.deliveryPlace,
         isComplete: false,
-        // Corregir el tipo de material usando el valor del formulario
-        typeMaterial: true, // Asegurar valor booleano
-        inkItems: items.map(item => ({
-          unitsQuantity: item.unitsQuantity,
-          amountKilograms: item.amountKilograms,
-          codeItem: item.codeItem,
-          isSatisfied: false,
+        typeMaterial: true,
+        inkItems: formValues.inkItems.map(item => ({
+          ...item,
+          isSatisfied: false
         })),
       };
 
-      console.log("Payload enviado:", payload); // Agregar log para depuración
-
       const response = await axios.post(`${url}/PurchaseOrder`, payload);
       if (response.status === 201) {
-        console.log('Antes de navegar');
-        navigate('/HomeShopping', { replace: true }); // Reemplaza la entrada en el historial
-        console.log('Después de navegar');
-        alert("Orden enviada correctamente.");
-
-        form.reset();
-        setItems([{ unitsQuantity: 0, codeItem: '', amountKilograms: 0 }]);
+        setOpen(false)
+        toast("Orden creada exitosamente", {
+          description: "Se ha registrado una nueva orden.",
+          action: {
+            label: "Deshacer",
+            onClick: () => {
+              const order = response.data;
+              deletePurchaseOrder(order.id_PurchaseOrder)
+            },
+          },
+        })
       }
-
     } catch (error) {
       console.error("Error al enviar los datos:", error);
       alert(`Error al enviar los datos: ${error instanceof Error ? error.message : "Error desconocido"}`);
@@ -192,9 +176,16 @@ export default function InkItemsData() {
     await sendDataToApi(values);
   }
 
+  const { control, handleSubmit, register, formState: { errors } } = form;
+
+
+  const { fields, append, remove } = useFieldArray({
+    name: "inkItems",
+    control,
+  });
 
   return (
-    <div className="w-270" style={{ maxHeight: '450px', overflowY: 'auto' }}>
+    <div className="w-270" style={{ maxHeight: '450px', overflowY: 'auto', overflowX : 'auto'}}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <div className="flex flex-row items-center justify-between">
@@ -400,13 +391,9 @@ export default function InkItemsData() {
             />
           </div>
           <div>
-
             <div className="flex flex-row justify-between">
               <h1 className="text-lg leading-none font-semibold ml-2.5">Items</h1>
-              <Button
-                type="button"
-                onClick={handleAddRow}
-                className="bg-blue-500 text-white px-4 py-2 rounded mr-2 hover:bg-blue-600">
+              <Button type="button" onClick={() => append({ unitsQuantity: 0, codeItem: '', amountKilograms: 0 })}>
                 Agregar Ítem
               </Button>
             </div>
@@ -416,48 +403,72 @@ export default function InkItemsData() {
                   <TableRow>
                     <TableHead>Unidades</TableHead>
                     <TableHead>Código</TableHead>
-                    <TableHead>Cantidad(Kg)</TableHead>
+                    <TableHead>Cantidad (Kg)</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.map((item, index) => (
-                    <TableRow key={index}>
+                  {fields.map((field, index) => (
+                    <TableRow key={field.id}>
                       <TableCell>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className='w-32'
-                          value={item.unitsQuantity}
-                          onChange={(e) => handleChange(index, 'unitsQuantity', e.target.value)} />
+                        <FormField
+                          control={control}
+                          name={`inkItems.${index}.unitsQuantity` as const}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="text"
-                          placeholder="Código"
-                          className='w-32 uppercase'
-                          value={item.codeItem}
-                          onChange={(e) =>
-                            handleChange(index, 'codeItem', e.target.value.toUpperCase())
-                          } />
+                        <FormField
+                          control={control}
+                          name={`inkItems.${index}.codeItem` as const}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input {...field} onChange={(e) => {
+                                  field.onChange(e.target.value.toUpperCase())
+                                }} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className='w-32'
-                          value={item.amountKilograms}
-                          onChange={(e) => handleChange(index, 'amountKilograms', e.target.value)} />
+                        <FormField
+                          control={control}
+                          name={`inkItems.${index}.amountKilograms` as const}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Button
-                          type="button"
-                          onClick={() => handleDeleteRow(index)}
-                          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        <Button type="button" variant="destructive" onClick={() => remove(index)}>
                           Eliminar
                         </Button>
                       </TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>))}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>

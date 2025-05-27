@@ -24,13 +24,17 @@ export function DataTable<TData, TValue>({
     const fuzzyFilter = (row: any, columnId: string, value: string) => {
         const search = value.toLowerCase()
         return (
-            row.original.idInk.toString().toLowerCase().includes(search) ||
-            row.original.id_InInk.toString().toLowerCase().includes(search) ||
-            row.original.provider_Name.toLowerCase().includes(search) ||
-            row.original.batchProvider.toString().toLowerCase().includes(search)||
+            row.original.type.toLowerCase().includes(search) ||
+            row.original.provider.toLowerCase().includes(search) ||
+            row.original.code.toLowerCase().includes(search) ||
+            row.original.purchaseOrder.toString().toLowerCase().includes(search)||
+            row.original.invoiceRemission.toString().toLowerCase().includes(search) ||
+            row.original.batchProvider.toString().toLowerCase().includes(search) ||
             row.original.internalBatch.toString().toLowerCase().includes(search) ||
-            row.original.type.toString().toLowerCase().includes(search) ||
-            row.original.code.toString().toLowerCase().includes(search)
+            row.original.qualityCertificate.toString().toLowerCase().includes(search) ||
+            row.original.date.toString().toLowerCase().includes(search) ||
+            row.original.units.toString().toLowerCase().includes(search) ||
+            row.original.quantity.toString().toLowerCase().includes(search)
         )
     }
 
@@ -38,6 +42,7 @@ export function DataTable<TData, TValue>({
         data,
         columns,
         globalFilterFn: fuzzyFilter,
+
         getPaginationRowModel: getPaginationRowModel(),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
@@ -66,7 +71,7 @@ export function DataTable<TData, TValue>({
                 />
                 <DataTableViewOptions table={table} />
             </div>
-            <div className="rounded-md border h-130" style={{ overflowY: "auto" }}>
+            <div className="rounded-md border" style={{ maxHeight: "400px", overflowY: "auto" }}>
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

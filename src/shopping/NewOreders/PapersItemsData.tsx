@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -12,12 +12,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { CalendarIcon } from "lucide-react"
-
+import { toast } from "sonner"
 import { format } from "date-fns"
 
+const url = import.meta.env.VITE_API_URL
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 
-const url = import.meta.env.VITE_API_URL
+import { useContext } from "react"
+
+import { GeneralDataContext } from "./GeneralDataContext"
 
 import {
   Select,
@@ -44,93 +47,46 @@ const productions = ['Productions 1', 'Productions 2', 'Productions 3', 'Product
   'Productions 7', 'Productions 8', 'Productions 9', 'Productions 10', 'Productions 11', 'Produuctions 12', 'Productions 13',
   'Productions 14', 'Productions 15', 'Productions 16', 'Productions 17', 'Produuctions 18',] as const;
 
+const DeliverPlaces = ['Galeana No. 45, Col. Acapantzingo, Cuernavaca, Morelos, México', 'Plan de Ayala, Cuernavaca, Morelos, México'] as const
 
 const formSchema = z.object({
   select: z.string().min(1, { message: 'Selecciona una producción' }),
-  orderNumber: z.coerce.number().min(1, { message: "Debe ser de al menos 4 digitos" }),
-  providers: z.string().min(1, { message: "Selecciona un proveedor" }),
+  orderNumber: z.coerce.number().min(1000, { message: "Debe ser de al menos 4 digitos" }),
+  providers: z.coerce.number().min(1, "Debe seleccionar un proveedor"),
   deliveryDateExpected: z.coerce.date({
     required_error: "Se espera una fecha",
   }),
   requiredBy: z.string().min(1, { message: "Este campo es requerido" }),
   paymentMethod: z.string().min(1, { message: "Este campo es requerido" }),
   shipment: z.string().min(1, { message: "Este campo es requerido" }),
-  typeMaterial: z.string().min(1, { message: "Este campo es requerido" }),
   deliveryPlace: z.string().min(1, { message: "Este campo es requerido" }),
+  paperItems: z.array(
+    z.object(
+      {
+        unitsQuantity: z.number().min(1, { message: 'Al menos una unidad ' }),
+        paperWidth: z.number().min(1, { message: 'Debe ser mayor a 1 mm' }),
+        paperlength: z.number().min(1, { message: 'Debe ser mayor a 1 m' }),
+        codeItem: z.string().min(4, { message: 'Minimo 4 caraceteres' })
+      }
+    )
+  )
 })
 
-function onSubmit(values: z.infer<typeof formSchema>) {
-  console.log(values)
-}
-
-interface PapersItemsModel {
-  unitsQuantity: number; // Unidades
-  codeItem: string; // 
-  paperWidthMM: number; // 
-  paperlengthM: number; // 
-}
 
 export default function PapersItemsData() {
+  const { setOpen } = useContext(GeneralDataContext)
   const [providers, setProviders] = useState<any[]>([])
-
-  const [items, setItems] = useState<PapersItemsModel[]>([
-    {
-      unitsQuantity: 0,
-      codeItem: '',
-      paperWidthMM: 0,
-      paperlengthM: 0,
-    },
-  ]);
-
-  const handleChange = (index: number, field: keyof PapersItemsModel, value: string) => {
-    const newItems = [...items];
-
-    switch (field) {
-      case 'unitsQuantity':
-        newItems[index].unitsQuantity = parseInt(value);
-        break;
-      case 'codeItem':
-        newItems[index].codeItem = value;
-        break;
-      case 'paperWidthMM':
-        newItems[index].paperWidthMM = parseInt(value);
-        break;
-      case 'paperlengthM':
-        newItems[index].paperlengthM = parseInt(value);
-        break;
-      default:
-        break;
-    }
-     setItems(newItems);
-  }
-
-  const handleAddRow = () => {
-    setItems([...items, { unitsQuantity: 0, codeItem: '', paperWidthMM: 0, paperlengthM: 0 }]);
-  };
-
-  const handleDeleteRow = (index: number) => {
-    const newItems = [...items];
-    newItems.splice(index, 1);
-    setItems(newItems);
-  };
 
   async function getProviders() {
     try {
       const response = await axios.get(`${url}/provider`);
-      const data = response.data.map((entry: any) => ({
-        id: entry.id,
-        name: entry.provider_Name,
-      }));
-
-      setProviders(data); // Asegúrate de que `setProviders` esté definido correctamente
-
-      return data; // Retorna los datos procesados correctamente
+      console.log("providers" + response.data)
+      setProviders(response.data); // Asegúrate de que `setProviders` esté definido correctamente
     } catch (error) {
       console.error("Error fetching data:", error);
       return []; // Retorna un array vacío en caso de error
     }
   }
-
 
   useEffect(() => {
     async function fetchData() {
@@ -149,20 +105,93 @@ export default function PapersItemsData() {
       requiredBy: '',
       paymentMethod: '',
       shipment: '',
-      typeMaterial: '',
       deliveryPlace: '',
+      paperItems: [{
+        unitsQuantity: 0,
+        paperWidth: 0,
+        paperlength: 0,
+        codeItem: ''
+      }]
     },
-
   })
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  async function deletePurchaseOrder(idOrder: number) {
+    try {
+      const response = await axios.delete(`${url}/PurchaseOrder/${idOrder}`)
+      if (response.status === 200) {
+        toast("Orden ELIMINADA exitosamente", {
+          description: "Se ha eliminado una nueva orden.",
+        })
+      }
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+      alert(`Error al enviar los datos: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    }
+
+  }
+
+
+  async function sendDataToApi(formValues: z.infer<typeof formSchema>) {
+    try {
+      const payload = {
+        purchaseOrderNumber: formValues.orderNumber,
+        provider: {
+          id_Provider: formValues.providers
+        },
+        requestDate: new Date().toISOString(),
+        deliveryDateExpected: formValues.deliveryDateExpected.toISOString(),
+        requiredBy: formValues.requiredBy,
+        paymentMethod: formValues.paymentMethod,
+        shipment: formValues.shipment,
+        deliveryPlace: formValues.deliveryPlace,
+        isComplete: false,
+        typeMaterial: false,
+        paperItems: formValues.paperItems.map(item => ({
+          ...item,
+          isSatisfied: false
+        })),
+      };
+
+      const response = await axios.post(`${url}/PurchaseOrder`, payload);
+      if (response.status === 201) {
+        setOpen(false)
+        toast("Orden creada exitosamente", {
+          description: "Se ha registrado una nueva orden.",
+          action: {
+            label: "Deshacer",
+            onClick: () => {
+              const order = response.data;
+              deletePurchaseOrder(order.id_PurchaseOrder)
+            },
+          },
+        })
+      }
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+      alert(`Error al enviar los datos: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    }
+  }
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Form submitted:", values)
+    await sendDataToApi(values);
+  }
+
+  const { control, handleSubmit, register, formState: { errors } } = form;
+
+
+  const { fields, append, remove } = useFieldArray({
+    name: "paperItems",
+    control,
+  });
 
   return (
-    <div className=" w-270" style={{maxHeight: '450px', overflowY: 'auto'}}>
+    <div className="w-270" style={{ maxHeight: '450px', overflowY: 'auto', overflowX: 'auto' }}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-          <div className="w-full" style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'space-between' }}>
+          <div className="flex flex-row items-center justify-between">
             <FormField
               control={form.control}
               name="select"
@@ -208,17 +237,25 @@ export default function PapersItemsData() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Proveedor</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))} // Convertir a número
+                    value={field.value?.toString()} // Convertir a string para el Select
+                  >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Proveedor? " />
+                        <SelectValue placeholder="Seleccionar proveedor">
+                          {providers.find(p => p.id_Provider === field.value)?.provider_Name || "Seleccionar"}
+                        </SelectValue>
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="max-h-60 overflow-y-auto"> {/* 👈 aquí el scroll */}
+                    <SelectContent className="max-h-60 overflow-y-auto">
                       <SelectGroup>
-                        {providers.map((provider, idx) => (
-                          <SelectItem key={provider.id || idx} value={provider.name}>
-                            {provider.name}
+                        {providers.map((provider) => (
+                          <SelectItem
+                            key={provider.id_Provider}
+                            value={provider.id_Provider.toString()} // Convertir a string
+                          >
+                            {provider.provider_Name}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -264,6 +301,7 @@ export default function PapersItemsData() {
                           disabled={(date) =>
                             date < new Date(new Date().setHours(0, 0, 0, 0))
                           }
+
                           initialFocus
                         />
                       </div>
@@ -304,7 +342,7 @@ export default function PapersItemsData() {
           <div className="flex flex-row justify-between">
             <FormField
               control={form.control}
-              name="providers"
+              name="paymentMethod"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Método de pago</FormLabel>
@@ -327,15 +365,29 @@ export default function PapersItemsData() {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="deliveryPlace"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lugar de entrega: </FormLabel>
-                  <FormControl>
-                    <Input placeholder='Nombre' {...field} type="text" className="w-230" />
-                  </FormControl>
+                  <FormLabel>Lugar de entrega</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-230">
+                        <SelectValue placeholder="Lugar" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="max-h-60 overflow-y-auto">
+                      <SelectGroup>
+                        {DeliverPlaces.map((place) => (
+                          <SelectItem key={place} value={place}>
+                            {place}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -344,10 +396,7 @@ export default function PapersItemsData() {
           <div>
             <div className="flex flex-row justify-between">
               <h1 className="text-lg leading-none font-semibold ml-2.5">Items</h1>
-              <Button
-                onClick={handleAddRow}
-                className="bg-blue-500 text-white px-4 py-2 rounded mr-2 hover:bg-blue-600"
-              >
+              <Button type="button" onClick={() => append({ unitsQuantity: 0, codeItem: '', paperWidth: 0, paperlength: 0 })}>
                 Agregar Ítem
               </Button>
             </div>
@@ -355,61 +404,98 @@ export default function PapersItemsData() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Cantidad</TableHead>
+                    <TableHead>Unidades</TableHead>
                     <TableHead>Código</TableHead>
                     <TableHead>Ancho(mm)</TableHead>
                     <TableHead>Largo(m)</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.map((item, index) => (
-                    <TableRow key={index}>
+                  {fields.map((field, index) => (
+                    <TableRow key={field.id}>
                       <TableCell>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className='w-32'
-                          value={item.unitsQuantity}
-                          onChange={(e) => handleChange(index, 'unitsQuantity', e.target.value)} />
+                        <FormField
+                          control={control}
+                          name={`paperItems.${index}.unitsQuantity` as const}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className='w-32'
-                          value={item.codeItem}
-                          onChange={(e) => handleChange(index, 'codeItem', e.target.value)} />
+                        <FormField
+                          control={control}
+                          name={`paperItems.${index}.codeItem` as const}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input {...field} onChange={(e) => {
+                                  field.onChange(e.target.value.toUpperCase())
+                                }} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className='w-32'
-                          value={item.paperWidthMM}
-                          onChange={(e) => handleChange(index, 'paperWidthMM', e.target.value)} />
+                        <FormField
+                          control={control}
+                          name={`paperItems.${index}.paperWidth` as const}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          className='w-32'
-                          value={item.paperlengthM}
-                          onChange={(e) => handleChange(index, 'paperlengthM', e.target.value)} />
+                        <FormField
+                          control={control}
+                          name={`paperItems.${index}.paperlength` as const}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Button
-                          onClick={() => handleDeleteRow(index)}
-                          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        <Button type="button" variant="destructive" onClick={() => remove(index)}>
                           Eliminar
                         </Button>
                       </TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>))}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
           </div>
-          <Button type="submit" className="bg-blue-600">Hecho</Button>
+          <Button type='submit' className="bg-blue-600">Hecho</Button>
         </form>
       </Form>
     </div>

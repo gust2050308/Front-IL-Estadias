@@ -1,15 +1,16 @@
 
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import NewEntries from './NewInputsInk/NewEntries';
+//import NewEntries from '../../NewEntries';
 import Entries from './InputInk/EntriesInk';
 import InkInUse from './InkInUse';
 import Existence from './Stock/Stock';
+import InputsFromOrders from './NewInputsInk/InputsFromOrders'
 
 export default function TintaActions() {
     return (
         <div>
-            <Tabs defaultValue="existence" className='w300'>
+            <Tabs defaultValue="existence" className='w-350'>
                 <TabsList>
                     <TabsTrigger value="existence">Existencia</TabsTrigger>
                     <TabsTrigger value="Outputs">Requeridas</TabsTrigger>
@@ -23,7 +24,7 @@ export default function TintaActions() {
                     <InkInUse />
                 </TabsContent>
                 <TabsContent value="add">
-                    <NewEntries/>
+                    <InputsFromOrders/>
                 </TabsContent>
                 <TabsContent value="entries">
                     <Entries/>

@@ -1,22 +1,16 @@
-//import { useState } from 'react'
-import './index.css'
-import Layout from './Layout.tsx'
+  import { Routes, Route } from 'react-router-dom';
+import Layout from './Layout';
+import HomeShopping from './shopping/HomeShopping';
+import AlmacenHome from './Store/AlmacenHome';
 
-import { useNavigate } from 'react-router-dom';
-
-function App() {
-
-  const navigate = useNavigate();
-
-  return (  
-      <div className="p-0 m-0 min-h-screen min-w-screen" style={{backgroundColor: '#E6E6FC'}}>
-        <Layout>
-          <div></div>
-          </Layout>
-      </div>
-  )
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<HomeShopping />} />
+        <Route path="/HomeShopping" element={<HomeShopping />} />
+        <Route path="/AlmacenHome" element={<AlmacenHome />} />
+      </Route>
+    </Routes>
+  );
 }
-
-export default App
-
-
