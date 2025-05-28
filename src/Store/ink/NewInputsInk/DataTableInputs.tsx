@@ -27,7 +27,7 @@ export function DataTable<TData, TValue>({
             row.original.type.toLowerCase().includes(search) ||
             row.original.provider.toLowerCase().includes(search) ||
             row.original.code.toLowerCase().includes(search) ||
-            row.original.purchaseOrder.toString().toLowerCase().includes(search)||
+            row.original.purchaseOrder.toString().toLowerCase().includes(search) ||
             row.original.invoiceRemission.toString().toLowerCase().includes(search) ||
             row.original.batchProvider.toString().toLowerCase().includes(search) ||
             row.original.internalBatch.toString().toLowerCase().includes(search) ||
@@ -78,7 +78,6 @@ export function DataTable<TData, TValue>({
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                    
                                         <TableHead key={header.id}>
                                             {header.isPlaceholder
                                                 ? null
@@ -100,7 +99,7 @@ export function DataTable<TData, TValue>({
                                     data-state={row.getIsSelected() && "selected"}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="max-w-50 truncate" style={{}}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}

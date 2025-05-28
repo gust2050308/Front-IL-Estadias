@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 
 export default function GeneralData() {
-  const { open, setOpen, tipoOrden} = useContext(GeneralDataContext)
+  const { open, setOpen, tipoOrden } = useContext(GeneralDataContext)
 
   return (
     <div style={{ marginTop: 100, flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -25,15 +25,15 @@ export default function GeneralData() {
         <DialogContent contentClassName="max-w-[600]" style={{ width: "60%" }}>
           <DialogHeader>
             <div className='flex flex-row justify-between'>
-              <div className="flex flex-col">
+              <div className="flex flex-col bg-blue-700">
                 <DialogTitle>Nueva orden de compra</DialogTitle>
                 <p className="text-sm text-muted-foreground mt-2">Llena todos los campos para poder realizar la orden</p>
               </div>
 
-              <div className='pr-10'>
+              <div className='pr-10 bg-amber-500'>
                 {tipoOrden === "tinta" ? (
                   /* Ícono de tinta */
-                  <svg
+                  <svg style={{overflow: "visible"}}
                     xmlns="http://www.w3.org/2000/svg"
                     width="50"
                     height="50"
