@@ -25,12 +25,12 @@ export default function GeneralData() {
         <DialogContent contentClassName="max-w-[600]" style={{ width: "60%" }}>
           <DialogHeader>
             <div className='flex flex-row justify-between'>
-              <div className="flex flex-col bg-blue-700">
+              <div className="flex flex-col ">
                 <DialogTitle>Nueva orden de compra</DialogTitle>
                 <p className="text-sm text-muted-foreground mt-2">Llena todos los campos para poder realizar la orden</p>
               </div>
 
-              <div className='pr-10 bg-amber-500'>
+              <div className='pr-10'>
                 {tipoOrden === "tinta" ? (
                   /* Ícono de tinta */
                   <svg style={{overflow: "visible"}}

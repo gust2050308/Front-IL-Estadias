@@ -119,9 +119,7 @@ export default function InkItemsData() {
     try {
       const response = await axios.delete(`${url}/PurchaseOrder/${idOrder}`)
       if (response.status === 200) {
-        toast("Orden ELIMINADA exitosamente", {
-          description: "Se ha eliminado una nueva orden.",
-        })
+        toast.success("Orden ELIMINADA exitosamente")
       }
     } catch (error) {
       console.error("Error al enviar los datos:", error);

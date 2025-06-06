@@ -20,7 +20,7 @@ export function GlobalDialog({ children }: GlobalDialogProps) {
 
   return (
     <Dialog modal={false} open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-400" style={{ width: "60%" }}>
+      <DialogContent className="max-w-400" style={{ width: "80%" }}>
         <DialogHeader>
           <DialogTitle>Registrar items de orden de compra</DialogTitle>
           <p className="text-sm text-muted-foreground mt-2">
@@ -30,7 +30,11 @@ export function GlobalDialog({ children }: GlobalDialogProps) {
 
         <div className="mt-2 space-y-2">
           {selectedRow && (
-            <MainForm/>
+            <div>
+              <MainForm>
+                {children}
+              </MainForm> 
+            </div>
           )}
         </div>
 
