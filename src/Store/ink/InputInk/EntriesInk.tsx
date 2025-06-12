@@ -9,27 +9,28 @@ export default function DemoPage() {
     const [data, setData] = useState<Entry[]>([])
 
     async function getData() {
-    axios.get(`${url}/inink`)
-        .then((response) => {
+        try {
+            const response = await axios.get(`${url}/inink`);
             const data = response.data.map((entry: any) => ({
-                id_InInk: entry.id_InInk,
-                date: entry.dateEntry.substring(0, 10),
-                provider: entry.provider.provider_Name,
+                id_InInk: entry.id,
+                date: entry.date.substring(0, 10),
+                provider: entry.provider,
                 invoiceRemission: entry.invoiceRemission,
-                purchaseOrder: entry.purchaseOrder.purchaseOrderNumber,
-                type: entry.type,
+                purchaseOrder: entry.orderNumber,
+                type: entry.typeMaterial,
                 code: entry.code,
                 units: entry.units,
-                quantityKilograms: entry.quantity,
+                quantityKilograms: entry.quantityKilograms,
                 batchProvider: entry.batchProvider,
                 internalBatch: entry.internalBatch,
                 qualityCertificate: entry.qualityCertificate,
             }));
             setData(data);
-        }, (error) => {
+        } catch (error) {
             console.error("Error fetching data:", error);
-        });
-}
+        }
+    }
+
 
     useEffect(() => {
         getData()

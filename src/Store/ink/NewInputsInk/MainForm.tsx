@@ -68,7 +68,6 @@ export default function MainForm({children}: {children: React.ReactNode}) {
     return (
         <div>
             {orderDataApi && (
-
                 <div>
                     <div className="flex flex-row justify-between gap-6 my-2">
                         <div className='flex flex-col space-y-2'>
@@ -85,10 +84,7 @@ export default function MainForm({children}: {children: React.ReactNode}) {
                         </div>
                     </div>
                     <ItemsDataForm />
-
                 </div>
-
-
             )}
         </div>
     )

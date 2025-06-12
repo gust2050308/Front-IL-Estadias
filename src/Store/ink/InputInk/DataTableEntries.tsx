@@ -62,7 +62,7 @@ export function DataTable<TData, TValue>({
 
     return (
         <div>
-            <div className="flex items-center py-4">
+            <div className="flex items-center">
                 <Input
                     placeholder="Buscar..."
                     value={globalFilter}
@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
                 />
                 <DataTableViewOptions table={table} />
             </div>
-            <div className="rounded-md border" style={{ maxHeight: "400px", overflowY: "auto" }}>
+            <div className="rounded-md border" style={{ maxHeight: "520px", overflowY: "auto" }}>
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

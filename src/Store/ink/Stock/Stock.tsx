@@ -2,32 +2,35 @@ import { DataTable } from './DataTableInksStock'
 import axios from 'axios'
 import { useEffect, useState } from "react"
 const url = import.meta.env.VITE_API_URL
-import type  {Stock} from './ColumnsStockInk'
+import type { Stock } from './ColumnsStockInk'
 import { columns } from "./ColumnsStockInk"
+import StockProvider from './StockContext'
+import FormOutputInk from '../OutputInk/FormOutputInk'
+import {GlobalDialog} from './GlobalDialog'
 
 export default function DemoPage() {
     const [data, setData] = useState<Stock[]>([])
 
     async function getData() {
-    axios.get(`${url}/ink/findInksWithStock`)
-        .then((response) => {
+        try {
+            const response = await axios.get(`${url}/ink/findInksWithStock`);
             const data = response.data.map((ink: any) => ({
-                idInk: ink.idInk,
-                id_InInk: ink.inInk.id_InInk,
-                provider_Name: ink.inInk.provider.provider_Name,
-                batchProvider: ink.inInk.batchProvider,
-                internalBatch: ink.inInk.internalBatch,
-                type: ink.inInk.type,
-                code: ink.inInk.code,
+                idInk: ink.id,
+                id_InInk: ink.idInInk,
+                provider_Name: ink.provider,
+                batchProvider: ink.batchProvider,
+                internalBatch: ink.internalBatch,
+                type: ink.typeOfMaterial,
+                code: ink.code,
                 totalQuantityKilograms: ink.totalKilograms,
-                remainingVolume: ink.remainingVolume,
-                volumeUsed: ink.volumeUsed,
+                remainingVolume: ink.remainingKilograms,
+                volumeUsed: ink.usedKilograms,
             }));
             setData(data);
-        }, (error) => {
+        } catch (error) {
             console.error("Error fetching data:", error);
-        });
-}
+        }
+    }
 
     useEffect(() => {
         getData()
@@ -37,7 +40,12 @@ export default function DemoPage() {
 
     return (
         <div className="container mt-2 h-150">
-            <DataTable columns={columns} data={data} />
+            <StockProvider>
+                <DataTable columns={columns} data={data} />
+                <GlobalDialog>
+                    <FormOutputInk />
+                </GlobalDialog>
+            </StockProvider>
         </div>
     )
 }
