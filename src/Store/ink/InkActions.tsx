@@ -17,12 +17,15 @@ export default function TintaActions() {
                     <TabsTrigger value="add">Agregar</TabsTrigger>
                     <TabsTrigger value="entries">Entradas</TabsTrigger>
                 </TabsList>
+
                 <TabsContent value="existence">
                     <Existence />
                 </TabsContent>
+
                 <TabsContent value="Outputs">
                     <InkInUse />
                 </TabsContent>
+                
                 <TabsContent value="add">
                     <InputsFromOrders/>
                 </TabsContent>

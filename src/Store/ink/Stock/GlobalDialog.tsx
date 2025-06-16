@@ -24,7 +24,7 @@ export function GlobalDialog({ children }: GlobalDialogProps) {
         <DialogHeader>
           <DialogTitle>Tinta requerida para produccion</DialogTitle>
           <p className="text-sm text-muted-foreground mt-2">
-            Revisa bien que coincidan los materiales con los Itmes de la orden...
+            Las cantidades que se capturan como requeridos o entregados no podrán ser modificadas!!
           </p>
         </DialogHeader>
 

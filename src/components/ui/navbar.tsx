@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Tab, initTWE } from "tw-elements";
 import { NavLink } from "react-router-dom";
-import logoInternational from '../../assets/internationalLogo.png';
 
 export default function Navbar() {
     useEffect(() => {
@@ -9,12 +8,11 @@ export default function Navbar() {
     }, []);
 
     return (
-        <nav className="w-full bg-blue-950">
+        <nav className="w-full bg-[#2667FF]">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo y Brand */}
                     <div className="flex items-center">
-                        <img src={logoInternational} className="w-20" alt="Logo" />
                         <NavLink to="/" className="ml-2 text-xl font-bold text-white">
                             International Label
                         </NavLink>
@@ -29,8 +27,8 @@ export default function Navbar() {
                                     className={({ isActive }) =>
                                         `my-2 block border-b-2 px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight
         ${isActive
-                                            ? 'border-blue-500 text-white'
-                                            : 'border-transparent text-neutral-300 hover:bg-blue-900'
+                                            ? 'border-[#DBE6FF] text-white'
+                                            : 'border-transparent text-[#FFFFFF] hover:bg-[#54494B]'
                                         }`
                                     }
                                 >
@@ -43,8 +41,8 @@ export default function Navbar() {
                                     className={({ isActive }) =>
                                         `my-2 block border-b-2 px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight
                                          ${isActive
-                                            ? 'border-blue-500 text-white'
-                                            : 'border-transparent text-neutral-300 hover:bg-blue-900'
+                                            ? 'border-[#DBE6FF] text-white'
+                                            : 'border-transparent text-[#FFFFFF] hover:bg-[#54494B]'
                                         }`
                                     }
                                 >
@@ -58,7 +56,7 @@ export default function Navbar() {
                     <div className="md:hidden">
                         <button
                             type="button"
-                            className="text-white hover:bg-blue-700 inline-flex items-center justify-center p-2 rounded-md"
+                            className="text-white hover:bg-[#56282D] inline-flex items-center justify-center p-2 rounded-md"
                             data-twe-collapse-init
                             data-twe-target="#mobile-menu"
                         >
@@ -74,10 +72,16 @@ export default function Navbar() {
             {/* Menú móvil (collapse) */}
             <div className="md:hidden" id="mobile-menu" data-twe-collapse-item>
                 <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <NavLink to="/HomeShopping" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md">
+                    <NavLink
+                        to="/HomeShopping"
+                        className="text-white hover:bg-[#56282D] block px-3 py-2 rounded-md"
+                    >
                         Compras
                     </NavLink>
-                    <NavLink to="/AlmacenHome" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md">
+                    <NavLink
+                        to="/AlmacenHome"
+                        className="text-white hover:bg-[#56282D] block px-3 py-2 rounded-md"
+                    >
                         Almacén
                     </NavLink>
                 </div>

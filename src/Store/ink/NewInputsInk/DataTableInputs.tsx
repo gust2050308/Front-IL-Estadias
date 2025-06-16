@@ -1,4 +1,3 @@
-"almacen"
 import type { ColumnDef, SortingState, ColumnFiltersState } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { flexRender, getCoreRowModel, useReactTable, getPaginationRowModel, getSortedRowModel, getFilteredRowModel, } from "@tanstack/react-table"
@@ -72,8 +71,8 @@ export function DataTable<TData, TValue>({
                 <DataTableViewOptions table={table} />
             </div>
             <div className="rounded-md border" style={{ maxHeight: "400px", overflowY: "auto" }}>
-                <Table>
-                    <TableHeader>
+                <Table className="table-auto">
+                    <TableHeader className="[&>tr>th]:text-white bg-[#424242]">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {

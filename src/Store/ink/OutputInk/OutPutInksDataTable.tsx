@@ -24,20 +24,15 @@ export function DataTable<TData, TValue>({
     const fuzzyFilter = (row: any, columnId: string, value: string) => {
         const search = value.toLowerCase()
         return (
-            row.original.id_InInk.toString().toLowerCase().includes(search) ||
+            row.original.idOutputInk.toString().toLowerCase().includes(search) ||
             row.original.date.toLowerCase().includes(search) ||
-            row.original.provider.toLowerCase().includes(search) ||
-            row.original.invoiceRemission.toString().toLowerCase().includes(search) ||
-            row.original.purchaseOrder.toString().toLowerCase().includes(search) ||
-            row.original.type.toString().toLowerCase().includes(search) ||
-            row.original.code.toString().toLowerCase().includes(search) ||
-            row.original.units.toString().toLowerCase().includes(search) ||
-            row.original.quantityKilograms.toString().toLowerCase().includes(search) ||
-            row.original.batchProvider.toString().toLowerCase().includes(search) ||
-            row.original.internalBatch.toString().toLowerCase().includes(search) ||
-            row.original.qualityCertificate.toString().toLowerCase().includes(search)
-
-        )
+            row.original.production.toString().toLowerCase().includes(search) ||
+            row.original.idInk.toString().toLowerCase().includes(search) ||
+            row.original.kilogramsRequired.toString().toLowerCase().includes(search) ||
+            row.original.kilogramsDelivered.toString().toLowerCase().includes(search) ||
+            row.original.whoDelivers.toString().toLowerCase().includes(search) ||
+            row.original.whoReceives.toString().toLowerCase().includes(search) 
+          )
     }
 
     const table = useReactTable({
@@ -64,7 +59,7 @@ export function DataTable<TData, TValue>({
 
     return (
         <div>
-            <div className="flex items-center">
+            <div className="flex items-center py-4">
                 <Input
                     placeholder="Buscar..."
                     value={globalFilter}
@@ -73,14 +68,13 @@ export function DataTable<TData, TValue>({
                 />
                 <DataTableViewOptions table={table} />
             </div>
-            <div className="rounded-md border" style={{ maxHeight: "520px", overflowY: "auto" }}>
+            <div className="rounded-md border" style={{ maxHeight: "400px", overflowY: "auto" }}>
                 <Table>
                     <TableHeader className="[&>tr>th]:text-white bg-[#424242]">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-
                                         <TableHead key={header.id}>
                                             {header.isPlaceholder
                                                 ? null
@@ -102,7 +96,7 @@ export function DataTable<TData, TValue>({
                                     data-state={row.getIsSelected() && "selected"}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="max-w-50 truncate" style={{}}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
@@ -111,7 +105,7 @@ export function DataTable<TData, TValue>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                    No hay ordenes en espera
                                 </TableCell>
                             </TableRow>
                         )}

@@ -12,9 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown } from "lucide-react"
-//import { Checkbox } from "@/components/ui/checkbox"
-
-
 
 export type Entry ={
     id_InInk: number

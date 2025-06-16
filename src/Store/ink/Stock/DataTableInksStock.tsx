@@ -25,12 +25,14 @@ export function DataTable<TData, TValue>({
         const search = value.toLowerCase()
         return (
             row.original.idInk.toString().toLowerCase().includes(search) ||
-            row.original.id_InInk.toString().toLowerCase().includes(search) ||
             row.original.provider_Name.toLowerCase().includes(search) ||
             row.original.batchProvider.toString().toLowerCase().includes(search)||
             row.original.internalBatch.toString().toLowerCase().includes(search) ||
             row.original.type.toString().toLowerCase().includes(search) ||
-            row.original.code.toString().toLowerCase().includes(search)
+            row.original.code.toString().toLowerCase().includes(search) ||
+            row.original.totalQuantityKilograms.toString().toLowerCase().includes(search) ||
+            row.original.remainingVolume.toString().toLowerCase().includes(search) ||
+            row.original.volumeUsed.toString().toLowerCase().includes(search) 
         )
     }
 
@@ -62,13 +64,13 @@ export function DataTable<TData, TValue>({
                     placeholder="Buscar..."
                     value={globalFilter}
                     onChange={(event) => setGlobalFilter(event.target.value)}
-                    className="max-w-md"
+                    className="max-w-md bg-[#d4d2d2]"
                 />
                 <DataTableViewOptions table={table} />
             </div>
             <div className="rounded-md border h-130" style={{ overflowY: "auto" }}>
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="[&>tr>th]:text-white bg-[#424242]">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
@@ -87,7 +89,7 @@ export function DataTable<TData, TValue>({
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="bg-[#D4D2D2]">
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
