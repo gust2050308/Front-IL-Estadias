@@ -2,7 +2,6 @@ import { useContext } from "react"
 import { TableFormContext } from './TableInputContext'
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,

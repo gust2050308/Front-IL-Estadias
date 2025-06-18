@@ -31,7 +31,8 @@ export function DataTable<TData, TValue>({
             row.original.kilogramsRequired.toString().toLowerCase().includes(search) ||
             row.original.kilogramsDelivered.toString().toLowerCase().includes(search) ||
             row.original.whoDelivers.toString().toLowerCase().includes(search) ||
-            row.original.whoReceives.toString().toLowerCase().includes(search) 
+            row.original.whoReceives.toString().toLowerCase().includes(search) ||
+            row.original.returnedKilogramsRequired.toStrnig().toLowerCase().includes(search)
           )
     }
 
@@ -57,6 +58,8 @@ export function DataTable<TData, TValue>({
         },
     })
 
+    console.log(columns)
+
     return (
         <div>
             <div className="flex items-center py-4">
@@ -64,11 +67,11 @@ export function DataTable<TData, TValue>({
                     placeholder="Buscar..."
                     value={globalFilter}
                     onChange={(event) => setGlobalFilter(event.target.value)}
-                    className="max-w-md"
+                    className="max-w-md bg-[#ececec]"
                 />
                 <DataTableViewOptions table={table} />
             </div>
-            <div className="rounded-md border" style={{ maxHeight: "400px", overflowY: "auto" }}>
+            <div className="rounded-md border max-h-300 overflow-y-auto ">
                 <Table>
                     <TableHeader className="[&>tr>th]:text-white bg-[#424242]">
                         {table.getHeaderGroups().map((headerGroup) => (

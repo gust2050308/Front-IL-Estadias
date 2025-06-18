@@ -64,12 +64,12 @@ export function DataTable<TData, TValue>({
 
     return (
         <div>
-            <div className="flex items-center">
+            <div className="flex items-center py-4">
                 <Input
                     placeholder="Buscar..."
                     value={globalFilter}
                     onChange={(event) => setGlobalFilter(event.target.value)}
-                    className="max-w-md"
+                    className="max-w-md bg-[#ececec]"
                 />
                 <DataTableViewOptions table={table} />
             </div>
@@ -108,9 +108,9 @@ export function DataTable<TData, TValue>({
                                     ))}
                                 </TableRow>
                             ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                        ) : (   
+                            <TableRow className="bg-[#D4D2D2]">
+                                <TableCell colSpan={columns.length} className="h-24 text-center bg-[#D4D2D2]">
                                     No results.
                                 </TableCell>
                             </TableRow>

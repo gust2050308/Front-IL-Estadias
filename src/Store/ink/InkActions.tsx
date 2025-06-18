@@ -23,7 +23,7 @@ export default function TintaActions() {
                 </TabsContent>
 
                 <TabsContent value="Outputs">
-                    <InkInUse />
+                    <InkInUse/>
                 </TabsContent>
                 
                 <TabsContent value="add">

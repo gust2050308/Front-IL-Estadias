@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
                     placeholder="Buscar..."
                     value={globalFilter}
                     onChange={(event) => setGlobalFilter(event.target.value)}
-                    className="max-w-md"
+                    className="max-w-md bg-[#ececec]"
                 />
                 <DataTableViewOptions table={table} />
             </div>
@@ -90,7 +90,7 @@ export function DataTable<TData, TValue>({
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="bg-[#D4D2D2]" >
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow

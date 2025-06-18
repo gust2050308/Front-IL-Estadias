@@ -11,6 +11,16 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from "@/components/ui/input-otp"
+
+import { REGEXP_ONLY_DIGITS } from "input-otp"
+
+
 import { Input } from "@/components/ui/input"
 import { useState, useEffect, useContext } from "react"
 const url = import.meta.env.VITE_API_URL
@@ -47,9 +57,9 @@ export default function FormOutputInk() {
 
     async function fetchData() {
         try {
-            const response = await axios.post(  // <- Cambiado a POST
+            const response = await axios.post(
                 `${url}/ink/findSelectedInks`,
-                numbers,  // Array de IDs
+                numbers,
                 { headers: { 'Content-Type': 'application/json' } }
             );
             toast.info(`Numero de ids: ${numbers}`);
@@ -93,16 +103,15 @@ export default function FormOutputInk() {
         // Guarda los datos temporalmente si necesitas usarlos después
         setTempData(dataToSend);
         console.log("Datos a enviar:", tempData);
-        // Muestra el diálogo
         setIsAlertOpen(true);
     }
 
     const handleConfirm = async () => {
-        setIsAlertOpen(false);
         try {
             const response = await axios.post(`${url}/ink/inksRequiredToProduction`, tempData);
             if (response.status === 200) {
                 toast.success("Datos enviados correctamente");
+                setIsAlertOpen(false);
                 setOpen(false);
                 setNumbers([]);
             }
@@ -112,20 +121,34 @@ export default function FormOutputInk() {
     };
 
     return (
-        <div className="w-full flex flex-row items-center justify-center max-h-150 overflow-y-auto">
+        <div className="w-full flex flex-row items-center justify-center max-h-150 overflow-y-auto px-3.5">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
                     <div>
                         <div className="flex flex-row items-center justify-between">
                             <FormField
-                                defaultValue={0}
                                 control={form.control}
                                 name="production"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Numero de orden de produccion</FormLabel>
+                                        <FormLabel>No. Orden </FormLabel>
                                         <FormControl>
-                                            <Input type="number" placeholder="00000" {...field} onChange={(e) => { field.onChange(e.target.valueAsNumber) }} max={99999} />
+                                            <InputOTP
+                                                maxLength={5}
+                                                pattern={REGEXP_ONLY_DIGITS}
+                                                value={field.value === 0 || !field.value ? "" : String(field.value)}
+                                                onChange={(value) => {
+                                                    const parsed = parseInt(value)
+                                                    if (!isNaN(parsed)) field.onChange(parsed)
+                                                    else field.onChange(undefined)
+                                                }}
+                                            >
+                                                <InputOTPGroup>
+                                                    {[0, 1, 2, 3, 4].map((index) => (
+                                                        <InputOTPSlot key={index} index={index} />
+                                                    ))}
+                                                </InputOTPGroup>
+                                            </InputOTP>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -141,7 +164,7 @@ export default function FormOutputInk() {
                                     <FormItem>
                                         <FormLabel>Quién entrega</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="¿Quien entrega?" {...field} maxLength={255} onChange={(e) => {field.onChange(e.target.value.toLocaleUpperCase())}}/>
+                                            <Input placeholder="¿Quien entrega?" {...field} maxLength={255} onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -157,7 +180,7 @@ export default function FormOutputInk() {
                                     <FormItem>
                                         <FormLabel>Quién recibe</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="¿Quien recibe?" {...field} maxLength={255} onChange={(e) => {field.onChange(e.target.value.toLocaleUpperCase())}}/>
+                                            <Input placeholder="¿Quien recibe?" {...field} maxLength={255} onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -234,11 +257,11 @@ export default function FormOutputInk() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-auto">id</TableHead>
-                                        <TableHead className="w-auto">Proveedor</TableHead>
-                                        <TableHead className="w-auto">Tipo de material</TableHead>
-                                        <TableHead className="w-auto">Kg's restantes</TableHead>
-                                        <TableHead className="w-auto">Kilos requeridos</TableHead>
-                                        <TableHead className="w-auto">Kilos entregados</TableHead>
+                                    <TableHead className="w-auto">Proveedor</TableHead>
+                                    <TableHead className="w-auto">Tipo de material</TableHead>
+                                    <TableHead className="w-auto">Kg's restantes</TableHead>
+                                    <TableHead className="w-auto">Kilos requeridos</TableHead>
+                                    <TableHead className="w-auto">Kilos entregados</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

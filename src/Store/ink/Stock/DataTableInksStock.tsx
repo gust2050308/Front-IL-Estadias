@@ -64,11 +64,11 @@ export function DataTable<TData, TValue>({
                     placeholder="Buscar..."
                     value={globalFilter}
                     onChange={(event) => setGlobalFilter(event.target.value)}
-                    className="max-w-md bg-[#d4d2d2]"
+                    className="max-w-md bg-[#ececec]"
                 />
                 <DataTableViewOptions table={table} />
             </div>
-            <div className="rounded-md border h-130" style={{ overflowY: "auto" }}>
+            <div className="rounded-md border max-h-300" style={{ overflowY: "auto" }}>
                 <Table>
                     <TableHeader className="[&>tr>th]:text-white bg-[#424242]">
                         {table.getHeaderGroups().map((headerGroup) => (

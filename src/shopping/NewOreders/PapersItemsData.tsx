@@ -41,16 +41,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-import { cn } from "@/lib/utils"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 
-const productions = ['Productions 1', 'Productions 2', 'Productions 3', 'Productions 4', 'Productions 5', 'Produuctions 6',
-  'Productions 7', 'Productions 8', 'Productions 9', 'Productions 10', 'Productions 11', 'Produuctions 12', 'Productions 13',
-  'Productions 14', 'Productions 15', 'Productions 16', 'Productions 17', 'Produuctions 18',] as const;
+import { REGEXP_ONLY_DIGITS } from "input-otp"
+
+import { cn } from "@/lib/utils"
 
 const DeliverPlaces = ['Galeana No. 45, Col. Acapantzingo, Cuernavaca, Morelos, México', 'Plan de Ayala, Cuernavaca, Morelos, México'] as const
 
 const formSchema = z.object({
-  select: z.string().min(1, { message: 'Selecciona una producción' }),
+  //select: z.string().min(1, { message: 'ingrese un numero de orden de produccion' }),
   orderNumber: z.coerce.number().min(1000, { message: "Debe ser de al menos 4 digitos" }),
   providers: z.coerce.number().min(1, "Debe seleccionar un proveedor"),
   deliveryDateExpected: z.coerce.date({
@@ -98,8 +102,8 @@ export default function PapersItemsData() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      select: undefined,
-      orderNumber: 0,
+      //select: undefined,
+      orderNumber: undefined,
       providers: undefined,
       deliveryDateExpected: new Date(),
       requiredBy: '',
@@ -107,9 +111,9 @@ export default function PapersItemsData() {
       shipment: '',
       deliveryPlace: '',
       paperItems: [{
-        unitsQuantity: 0,
-        paperWidth: 0,
-        paperlength: 0,
+        unitsQuantity: undefined,
+        paperWidth: undefined,
+        paperlength: undefined,
         codeItem: ''
       }]
     },
@@ -188,11 +192,11 @@ export default function PapersItemsData() {
   });
 
   return (
-    <div className="w-270" style={{ maxHeight: '450px', overflowY: 'auto', overflowX: 'auto' }}>
+    <div className="w-270 p-2" style={{ maxHeight: '450px', overflowY: 'auto', overflowX: 'auto' }}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <div className="flex flex-row items-center justify-between">
-            <FormField
+            {/* <FormField
               control={form.control}
               name="select"
               render={({ field }) => (
@@ -204,7 +208,7 @@ export default function PapersItemsData() {
                         <SelectValue placeholder="No Producción" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="max-h-60 overflow-y-auto"> {/* 👈 aquí el scroll */}
+                    <SelectContent className="max-h-60 overflow-y-auto"> 
                       <SelectGroup>
                         {productions.map((production) => (
                           <SelectItem key={production} value={production}>
@@ -218,6 +222,7 @@ export default function PapersItemsData() {
                 </FormItem>
               )}
             />
+            */}
             <FormField
               control={form.control}
               name="orderNumber"
@@ -225,7 +230,22 @@ export default function PapersItemsData() {
                 <FormItem>
                   <FormLabel>No. Orden </FormLabel>
                   <FormControl>
-                    <Input placeholder='0' {...field} type="number" style={{ width: 200 }} maxLength={5} />
+                    <InputOTP
+                      maxLength={4}
+                      pattern={REGEXP_ONLY_DIGITS}
+                      value={field.value === 0 || !field.value ? "" : String(field.value)}
+                      onChange={(value) => {
+                        const parsed = parseInt(value)
+                        if (!isNaN(parsed)) field.onChange(parsed)
+                        else field.onChange(undefined)
+                      }}
+                    >
+                      <InputOTPGroup>
+                        {[0, 1, 2, 3].map((index) => (
+                          <InputOTPSlot key={index} index={index} />
+                        ))}
+                      </InputOTPGroup>
+                    </InputOTP>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -265,8 +285,7 @@ export default function PapersItemsData() {
                 </FormItem>
               )}
             />
-          </div>
-          <div className='justify-between' style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+
             <FormField
               control={form.control}
               name="deliveryDateExpected"
@@ -312,6 +331,8 @@ export default function PapersItemsData() {
                 </FormItem>
               )}
             />
+          </div>
+          <div className='justify-between w-full' >
             <FormField
               control={form.control}
               name="shipment"
@@ -319,7 +340,7 @@ export default function PapersItemsData() {
                 <FormItem>
                   <FormLabel>Embarque: </FormLabel>
                   <FormControl>
-                    <Input placeholder='Lugar ' {...field} type="text" className="w-200" />
+                    <Input placeholder='Lugar ' {...field} type="text" className="w-full" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -375,7 +396,7 @@ export default function PapersItemsData() {
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-230">
-                        <SelectValue placeholder="Lugar" />
+                        <SelectValue placeholder="Seleccionar lugar" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="max-h-60 overflow-y-auto">
