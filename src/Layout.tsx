@@ -13,10 +13,10 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#FDFAFA' }}>
+    <div className="h-screen w-full flex flex-col bg-gradient-to-r from-[#f5f5f5] to-gray-200">
       <Toaster richColors />
       <Navbar />
-      <main className="flex-grow p-4   md:p-8">
+      <main className='pt-3 h-full w-full'>
         <Outlet />
       </main>
       <Footer />

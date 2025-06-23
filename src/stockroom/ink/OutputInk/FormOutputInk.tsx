@@ -121,40 +121,38 @@ export default function FormOutputInk() {
     };
 
     return (
-        <div className="w-full flex flex-row items-center justify-center max-h-150 overflow-y-auto px-3.5">
+        <div className="w-full flex flex-row items-center justify-center max-h-200 px-3.5">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full px-2">
                     <div>
-                        <div className="flex flex-row items-center justify-between">
-                            <FormField
-                                control={form.control}
-                                name="production"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>No. Orden </FormLabel>
-                                        <FormControl>
-                                            <InputOTP
-                                                maxLength={5}
-                                                pattern={REGEXP_ONLY_DIGITS}
-                                                value={field.value === 0 || !field.value ? "" : String(field.value)}
-                                                onChange={(value) => {
-                                                    const parsed = parseInt(value)
-                                                    if (!isNaN(parsed)) field.onChange(parsed)
-                                                    else field.onChange(undefined)
-                                                }}
-                                            >
-                                                <InputOTPGroup>
-                                                    {[0, 1, 2, 3, 4].map((index) => (
-                                                        <InputOTPSlot key={index} index={index} />
-                                                    ))}
-                                                </InputOTPGroup>
-                                            </InputOTP>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                        <FormField
+                            control={form.control}
+                            name="production"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>No. Orden </FormLabel>
+                                    <FormControl>
+                                        <InputOTP
+                                            maxLength={5}
+                                            pattern={REGEXP_ONLY_DIGITS}
+                                            value={field.value === 0 || !field.value ? "" : String(field.value)}
+                                            onChange={(value) => {
+                                                const parsed = parseInt(value)
+                                                if (!isNaN(parsed)) field.onChange(parsed)
+                                                else field.onChange(undefined)
+                                            }}
+                                        >
+                                            <InputOTPGroup>
+                                                {[0, 1, 2, 3, 4].map((index) => (
+                                                    <InputOTPSlot key={index} index={index} className='bg-gray-100' />
+                                                ))}
+                                            </InputOTPGroup>
+                                        </InputOTP>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <div className="mt-4">
                             <FormField
                                 defaultValue="0"
@@ -164,7 +162,7 @@ export default function FormOutputInk() {
                                     <FormItem>
                                         <FormLabel>Quién entrega</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="¿Quien entrega?" {...field} maxLength={255} onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
+                                            <Input placeholder="¿Quien entrega?" {...field} maxLength={255} onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} className='bg-gray-100' />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -180,67 +178,71 @@ export default function FormOutputInk() {
                                     <FormItem>
                                         <FormLabel>Quién recibe</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="¿Quien recibe?" {...field} maxLength={255} onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
+                                            <Input placeholder="¿Quien recibe?" {...field} maxLength={255} onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} className='bg-gray-100' />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </div>
-                        <div className="mt-4 max-h-80 overflow-y-auto ">
-                            <Table className="mt-4">
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-auto">id</TableHead>
-                                        <TableHead className="w-auto">Proveedor</TableHead>
-                                        <TableHead className="w-auto">Tipo de material</TableHead>
-                                        <TableHead className="w-auto">Kg's restantes</TableHead>
-                                        <TableHead className="w-auto">Kilos requeridos</TableHead>
-                                        <TableHead className="w-auto">Kilos entregados</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {ApiData && ApiData.map((item: any, index: number) => (
-                                        <TableRow key={index}>
-                                            <TableCell className="w-auto">{item.id}</TableCell>
-                                            <TableCell className="w-auto">{item.provider}</TableCell>
-                                            <TableCell className="w-auto">{item.typeMateria}</TableCell>
-                                            <TableCell className="w-auto">{item.volumenRemaiming}</TableCell>
-                                            <TableCell className="w-auto">
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`inks.${index}.kilogramsRequired`}
-                                                    render={({ field }) => (
-
-                                                        <FormItem>
-                                                            <FormControl>
-                                                                <Input type="number" placeholder="Kg's requeridos" {...field} onChange={(e) => { field.onChange(e.target.valueAsNumber) }} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell className="w-auto">
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`inks.${index}.kilogramsDelivered`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormControl>
-                                                                <Input type="number" placeholder="Kg's entregados" {...field} onChange={(e) => { field.onChange(e.target.valueAsNumber) }} max={item.volumenRemaiming} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </TableCell>
+                        <div className='mt-4'>
+                            <div className=" max-h-80 overflow-y-auto rounded-md py-5">
+                                <Table className='rounded-md'>
+                                    <TableHeader className='' >
+                                        <TableRow className='rounded-md'>
+                                            <TableHead className="w-auto rounded-tl-md">id</TableHead>
+                                            <TableHead className="w-auto">Proveedor</TableHead>
+                                            <TableHead className="w-auto">Tipo de material</TableHead>
+                                            <TableHead className="w-auto">Kg's restantes</TableHead>
+                                            <TableHead className="w-auto">Kilos requeridos</TableHead>
+                                            <TableHead className="w-auto rounded-tr-md">Kilos entregados</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {ApiData && ApiData.map((item: any, index: number) => (
+                                            <TableRow key={index}>
+                                                <TableCell className="w-auto">{item.id}</TableCell>
+                                                <TableCell className="w-auto">{item.provider}</TableCell>
+                                                <TableCell className="w-auto">{item.typeMateria}</TableCell>
+                                                <TableCell className="w-auto">{item.volumenRemaiming}</TableCell>
+                                                <TableCell className="w-auto">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`inks.${index}.kilogramsRequired`}
+                                                        render={({ field }) => (
+
+                                                            <FormItem>
+                                                                <FormControl>
+                                                                    <Input defaultValue={0} type="number" placeholder="Kg's requeridos" {...field} onChange={(e) => { field.onChange(e.target.valueAsNumber) }} className='bg-gray-100' />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </TableCell>
+                                                <TableCell className="w-auto">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`inks.${index}.kilogramsDelivered`}
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormControl>
+
+                                                                    <Input defaultValue={0} type="number" placeholder="Kg's entregados" {...field} onChange={(e) => { field.onChange(e.target.valueAsNumber) }} max={item.volumenRemaiming} className='bg-gray-100' />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </div>
                     </div>
+
                     <Button type="submit" className="bg-blue-600">Hecho</Button>
                 </form>
             </Form>

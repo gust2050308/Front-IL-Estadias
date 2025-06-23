@@ -25,10 +25,8 @@ export type Entry ={
     type: string
     code: string
     units: number
-
     weightPaper: number
     largePaper: number
-
     batchProvider : string
     internalBatch: string
     qualityCertificate : "Si" | "No" | "Pendiente"

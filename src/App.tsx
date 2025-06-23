@@ -1,7 +1,7 @@
   import { Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 import HomeShopping from './shopping/HomeShopping';
-import AlmacenHome from './Store/AlmacenHome';
+import AlmacenHome from './stockroom/AlmacenHome';
 
 export default function App() {
   return (

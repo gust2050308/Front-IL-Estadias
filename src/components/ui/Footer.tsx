@@ -1,8 +1,7 @@
 
 export default function Footer() {
   return (
-    <div>
-      
+    <div className='bg-pink-400 max-h-full'>
     </div>
   )
 }

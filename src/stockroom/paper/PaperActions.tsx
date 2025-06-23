@@ -6,7 +6,7 @@ import Existence from './InputPaper/Existence';
 
 export default function PaperActions() {
     return (
-        <div>
+        <div className="bg-green-400 w-full h-full">
             <Tabs defaultValue="Exist" className='w300'>
                 <TabsList>
                     <TabsTrigger value="Exist">Existencia</TabsTrigger>

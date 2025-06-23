@@ -138,7 +138,7 @@ export default function InkItemsData() {
       const payload = {
         purchaseOrderNumber: formValues.orderNumber,
         provider: {
-          id_Provider: formValues.providers
+          idProvider: formValues.providers
         },
         requestDate: new Date().toISOString(),
         deliveryDateExpected: formValues.deliveryDateExpected.toISOString(),
@@ -192,33 +192,6 @@ export default function InkItemsData() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <div className="flex flex-row items-center justify-between">
-            {/* <FormField
-              control={form.control}
-              name="select"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Producción</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="No Producción" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="max-h-60 overflow-y-auto"> 
-                      <SelectGroup>
-                        {productions.map((production) => (
-                          <SelectItem key={production} value={production}>
-                            {production}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            */}
             <FormField
               control={form.control}
               name="orderNumber"
@@ -260,7 +233,7 @@ export default function InkItemsData() {
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar proveedor">
-                          {providers.find(p => p.id_Provider === field.value)?.provider_Name || "Seleccionar"}
+                          {providers.find(p => p.idProvider === field.value)?.providerName || "Seleccionar"}
                         </SelectValue>
                       </SelectTrigger>
                     </FormControl>
@@ -268,10 +241,10 @@ export default function InkItemsData() {
                       <SelectGroup>
                         {providers.map((provider) => (
                           <SelectItem
-                            key={provider.id_Provider}
-                            value={provider.id_Provider.toString()} // Convertir a string
+                            key={provider.idProvider}
+                            value={provider.idProvider.toString()} // Convertir a string
                           >
-                            {provider.provider_Name}
+                            {provider.providerName}
                           </SelectItem>
                         ))}
                       </SelectGroup>

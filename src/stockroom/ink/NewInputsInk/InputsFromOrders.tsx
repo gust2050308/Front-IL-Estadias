@@ -21,7 +21,7 @@ export default function InputsFromOrders() {
       .then((response) => {
         const datos = response.data.map((order: any) => ({
           orderNumber: order.purchaseOrderNumber,
-          provider: order.provider.provider_Name,
+          provider: order.provider.providerName,
           requestDate: order.requestDate.substring(0, 10),
           deliveryDateExpected: order.deliveryDateExpected.substring(0, 10),
           requiredBy: order.requiredBy,
@@ -43,6 +43,7 @@ export default function InputsFromOrders() {
   return (
     <div>
       <TableFormProvider>
+        
         <DataTable columns={columns} data={data} />
         <GlobalDialog>
           <MainForm>

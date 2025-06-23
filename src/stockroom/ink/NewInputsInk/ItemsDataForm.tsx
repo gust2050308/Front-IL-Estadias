@@ -7,7 +7,6 @@ import {
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -19,6 +18,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Checkbox } from "@/components/ui/checkbox"
 const url = import.meta.env.VITE_API_URL
 import axios from 'axios'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 const itemSchema = z.object({
     unitsArrived: z.number().min(1, "Al menos 1 unidad"),
     invoiceRemission: z.string().min(1, "El campo es requerido"),
@@ -27,7 +32,7 @@ const itemSchema = z.object({
     internalBatch: z.string().min(1, "El campo es requerido"),
     qualityCertificate: z.string().optional(),
     isSelected: z.boolean().optional(),
-    syncGroup: z.number().optional() // Nuevo campo para agrupar filas sincronizadas
+    syncGroup: z.number().optional()
 })
 
 const formSchema = z.object({
@@ -45,8 +50,10 @@ export default function ItemsDataForm() {
     const { orderData, setOpen } = useContext(TableFormContext)
     const [itemsOrder, setItemsOrder] = useState<InkItem[]>([])
     const [visibleIndexes, setVisibleIndexes] = useState<number[]>([])
-    const [nextGroupId, setNextGroupId] = useState(1) // Contador para grupos de sincronización
+    const [nextGroupId, setNextGroupId] = useState(1)
     const [filteredData, setFilteredData] = useState<InkItem[]>([])
+    const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
+
 
     useEffect(() => {
         if (orderData?.inkItems) {
@@ -59,7 +66,7 @@ export default function ItemsDataForm() {
                 internalBatch: '',
                 qualityCertificate: '',
                 isSelected: false,
-                syncGroup: 0 // 0 significa que no está en ningún grupo
+                syncGroup: 0
             }))
             form.reset({ inkItems: defaultFormValues })
             setVisibleIndexes(orderData.inkItems.map((_: InkItem, idx: number) => idx))
@@ -89,35 +96,70 @@ export default function ItemsDataForm() {
         control,
     })
 
-    // Manejar cambios en los checkboxes
-    const handleCheckboxChange = (index: number, checked: boolean) => {
-        const currentValues = getValues()
+    // Verifica si todos los items están seleccionados
+    const areAllItemsSelected = () => {
+        const values = getValues();
+        return values.inkItems.length > 0 &&
+            values.inkItems.every(item => item.isSelected);
+    };
+
+    // Maneja el cambio del checkbox global
+    const handleGlobalCheckboxChange = (checked: boolean) => {
+        const currentValues = getValues();
 
         if (checked) {
-            // Cuando se selecciona un checkbox:
-            // 1. Buscar si hay otros checkboxes seleccionados
-            const selectedGroups = currentValues.inkItems
-                .map(item => item.isSelected ? item.syncGroup : 0)
-                .filter(group => group !== 0)
+            // Crear un nuevo grupo para la selección global
+            const newGroupId = nextGroupId;
+            setCurrentGroupId(newGroupId);
+            setNextGroupId(newGroupId + 1);
 
-            if (selectedGroups.length > 0) {
-                // Unirse a un grupo existente (tomamos el primer grupo encontrado)
-                setValue(`inkItems.${index}.syncGroup`, selectedGroups[0])
+            // Actualizar todos los items
+            currentValues.inkItems.forEach((_, index) => {
+                setValue(`inkItems.${index}.isSelected`, true);
+                setValue(`inkItems.${index}.syncGroup`, newGroupId);
+            });
+        } else {
+            // Deseleccionar todos y limpiar grupos
+            currentValues.inkItems.forEach((_, index) => {
+                setValue(`inkItems.${index}.isSelected`, false);
+                setValue(`inkItems.${index}.syncGroup`, 0);
+            });
+            setCurrentGroupId(null);
+        }
+    };
+
+    const handleCheckboxChange = (index: number, checked: boolean) => {
+        const currentValues = getValues();
+        const currentItem = currentValues.inkItems[index];
+
+        if (checked) {
+            // Si hay un grupo global activo, unirse a él
+            if (currentGroupId !== null) {
+                setValue(`inkItems.${index}.syncGroup`, currentGroupId);
             } else {
-                // Crear un nuevo grupo
-                setValue(`inkItems.${index}.syncGroup`, nextGroupId)
-                setNextGroupId(nextGroupId + 1)
+                // Buscar si hay otros checkboxes seleccionados
+                const selectedGroups = currentValues.inkItems
+                    .map(item => item.isSelected ? item.syncGroup : 0)
+                    .filter(group => group !== 0);
+
+                if (selectedGroups.length > 0) {
+                    // Unirse a un grupo existente
+                    setValue(`inkItems.${index}.syncGroup`, selectedGroups[0]);
+                } else {
+                    // Crear un nuevo grupo
+                    setValue(`inkItems.${index}.syncGroup`, nextGroupId);
+                    setNextGroupId(nextGroupId + 1);
+                }
             }
         } else {
             // Cuando se deselecciona: salir del grupo
-            setValue(`inkItems.${index}.syncGroup`, 0)
+            setValue(`inkItems.${index}.syncGroup`, 0);
         }
 
         // Actualizar el estado del checkbox
-        setValue(`inkItems.${index}.isSelected`, checked)
-    }
+        setValue(`inkItems.${index}.isSelected`, checked);
+    };
 
-    // Manejar cambios en los campos de entrada
     const handleFieldChange = (fieldName: keyof typeof itemSchema.shape, index: number, value: any) => {
         const currentValues = getValues()
         const currentItem = currentValues.inkItems[index]
@@ -137,11 +179,11 @@ export default function ItemsDataForm() {
 
     const onSubmit = (data: any) => {
         const filteredData = visibleIndexes.map(i => ({
-            ...itemsOrder[i],            // contiene el idItemOrder y metainformación
-            ...data.inkItems[i],         // contiene los campos de inkEntry llenados en el formulario
+            ...itemsOrder[i],
+            ...data.inkItems[i],
         }));
         setFilteredData(filteredData);
-        saveData(filteredData);         // <-- se pasa como argumento
+        saveData(filteredData);
     };
 
     type InkEntry = {
@@ -160,47 +202,44 @@ export default function ItemsDataForm() {
     };
 
     async function saveData(filteredData: any[]) {
-    try {
-        const now = new Date().toISOString();
+        try {
+            const now = new Date().toISOString();
 
-        const dataToSend: InfoToApi[] = filteredData.map(item => ({
-            idItemOrder: item.idItemOrder,
-            inkEntry: {
-                dateEntry: now,
-                invoiceRemission: item.invoiceRemission,
-                typeMaterial: item.typeMaterial,
-                batchProvider: item.batchProvider,
-                internalBatch: item.internalBatch,
-                unitsArrived: item.unitsArrived,
-                qualityCertificate: item.qualityCertificate || "PENDIENTE",
+            const dataToSend: InfoToApi[] = filteredData.map(item => ({
+                idItemOrder: item.idItemOrder,
+                inkEntry: {
+                    dateEntry: now,
+                    invoiceRemission: item.invoiceRemission,
+                    typeMaterial: item.typeMaterial,
+                    batchProvider: item.batchProvider,
+                    internalBatch: item.internalBatch,
+                    unitsArrived: item.unitsArrived,
+                    qualityCertificate: item.qualityCertificate || "PENDIENTE",
+                }
+            }));
+
+            const response = await axios.post(`${url}/inink`, dataToSend, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.status === 200) {
+                setOpen(false);
+                setItemsOrder([]);
+                setVisibleIndexes([]);
+                form.reset();
+                toast.success("Datos enviados correctamente");
             }
-        }));
-
-        // Envío con Axios
-        const response = await axios.post(`${url}/inink`, dataToSend, {
-            headers: {
-                'Content-Type': 'application/json',
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.message || error.message;
+                toast.error(`Error al enviar los datos: ${errorMessage}`);
+            } else {
+                toast.error("Error inesperado al enviar los datos");
             }
-        });
-
-        if (response.status === 200) {
-            setOpen(false); // Cerrar el modal o formulario
-            setItemsOrder([]); // Limpiar los items
-            setVisibleIndexes([]); // Limpiar los índices visibles
-            form.reset(); // Resetear el formulario
-            toast.success("Datos enviados correctamente");
-        }
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            // Error específico de Axios
-            const errorMessage = error.response?.data?.message || error.message;
-            toast.error(`Error al enviar los datos: ${errorMessage}`);
-        } else {
-            // Error genérico
-            toast.error("Error inesperado al enviar los datos");
         }
     }
-}
 
     const handleRemove = (index: number) => {
         remove(index)
@@ -215,7 +254,22 @@ export default function ItemsDataForm() {
                         <Table className="min-w-full border-collapse">
                             <TableHeader className='sticky top-0 z-10'>
                                 <TableRow>
-                                    <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Seleccionar</TableHead>
+                                    <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">
+                                        <Tooltip >
+                                            <TooltipTrigger
+                                                className='none'
+                                                asChild>
+                                                <Checkbox
+                                                    checked={areAllItemsSelected()}
+                                                    onCheckedChange={(checked) => handleGlobalCheckboxChange(!!checked)}
+                                                    className="mr-2 bg-gray-300"
+                                                />
+                                            </TooltipTrigger>
+                                            <TooltipContent className='bg-gray-200 text-black'>
+                                                <p>Seleccionar todo</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TableHead>
                                     <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Unidades solicitadas</TableHead>
                                     <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Unidades Entrantes</TableHead>
                                     <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Cantidad(Kg)</TableHead>
@@ -239,6 +293,7 @@ export default function ItemsDataForm() {
                                                     <FormItem>
                                                         <FormControl>
                                                             <Checkbox
+                                                                className='bg-gray-300'
                                                                 checked={field.value}
                                                                 onCheckedChange={(checked) => {
                                                                     handleCheckboxChange(index, !!checked)
@@ -388,15 +443,23 @@ export default function ItemsDataForm() {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            <Button
-                                                type="button"
-                                                className="bg-rose-800 text-white hover:bg-red-600"
-                                                onClick={() => setVisibleIndexes(prev => prev.filter(i => i !== index))}
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                                    <path fill="currentColor" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m11.333-2.167a.825.825 0 0 0-1.166-1.166l-5.5 5.5a.825.825 0 0 0 1.166 1.166Z" />
-                                                </svg>
-                                            </Button>
+
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Button
+                                                        type="button"
+                                                        className="bg-rose-800 text-white hover:bg-red-600"
+                                                        onClick={() => setVisibleIndexes(prev => prev.filter(i => i !== index))}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                                            <path fill="currentColor" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m11.333-2.167a.825.825 0 0 0-1.166-1.166l-5.5 5.5a.825.825 0 0 0 1.166 1.166Z" />
+                                                        </svg>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent className='bg-gray-200 text-black'>
+                                                    <p>Quitar </p>
+                                                </TooltipContent>
+                                            </Tooltip>
                                         </TableCell>
                                     </TableRow>
                                 ))}

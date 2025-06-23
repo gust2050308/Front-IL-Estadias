@@ -9,6 +9,8 @@ export const StockContext = createContext<{
     addNumber: (id: number) => void
     removeNumber: (id: number) => void
     toggleNumber: (id: number) => void // Sin el signo de interrogación
+    refreshData: () => void
+    refreshKey: number
 }>({
     open: false,
     setOpen: () => { },
@@ -16,12 +18,17 @@ export const StockContext = createContext<{
     setNumbers: () => { },
     addNumber: () => { },
     removeNumber: () => { },
-    toggleNumber: () => { }
+    toggleNumber: () => { },
+    refreshData: () => { },
+    refreshKey: 0
 })
 
 const StockProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [open, setOpen] = useState(false)
     const [numbers, setNumbers] = useState<number[]>([])
+    const [refreshKey, setRefreshKey] = useState(0)
+    const refreshData = () => setRefreshKey(prev => prev + 1)
+
 
     const addNumber = (id: number) => {
         setNumbers(prev =>
@@ -50,7 +57,9 @@ const StockProvider: FC<{ children: ReactNode }> = ({ children }) => {
                 setNumbers,
                 addNumber,
                 removeNumber,
-                toggleNumber
+                toggleNumber,
+                refreshData,
+                refreshKey
             }}>
             {children}
         </StockContext.Provider>
