@@ -1,5 +1,16 @@
 import { createContext, useState, type FC } from "react"
 import type { ReactNode } from "react"
+import { toast } from "sonner"
+
+export type filterType = {
+    idProvider: number
+    batchProvider: string
+    internalBatch: string
+    typeMaterial: string
+    codeItem: string
+    minRemaining: number
+    maxRemaining: number
+}
 
 export const StockContext = createContext<{
     open: boolean
@@ -11,6 +22,8 @@ export const StockContext = createContext<{
     toggleNumber: (id: number) => void // Sin el signo de interrogación
     refreshData: () => void
     refreshKey: number
+    filter?: filterType
+    setFilter?: (filter: filterType) => void
 }>({
     open: false,
     setOpen: () => { },
@@ -27,9 +40,11 @@ const StockProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [open, setOpen] = useState(false)
     const [numbers, setNumbers] = useState<number[]>([])
     const [refreshKey, setRefreshKey] = useState(0)
-    const refreshData = () => setRefreshKey(prev => prev + 1)
-
-
+    const refreshData = () => {
+        setRefreshKey(prev => prev + 1)
+        toast.info('Actualizando datos...' + refreshKey)
+    }
+    const [filter, setFilter] = useState<filterType | undefined>(undefined)
     const addNumber = (id: number) => {
         setNumbers(prev =>
             prev.includes(id) ? prev : [...prev, id]
@@ -59,7 +74,9 @@ const StockProvider: FC<{ children: ReactNode }> = ({ children }) => {
                 removeNumber,
                 toggleNumber,
                 refreshData,
-                refreshKey
+                refreshKey,
+                filter,
+                setFilter
             }}>
             {children}
         </StockContext.Provider>

@@ -1,8 +1,14 @@
-import type { ColumnDef, Row } from "@tanstack/react-table"
+import type { ColumnDef, Row, Table } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from '@/components/ui/checkbox'
 import { useContext } from "react"
 import { OutputContext } from "./OutputContext"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { toast } from "sonner"
 
 export type OutPut = {
     idOutputInk: number,
@@ -18,44 +24,29 @@ export type OutPut = {
     returnedKilogramsRequired: number
 }
 
-const SelectHeader = ({ table }: { table: any }) => {
-    const { setNumbers, numbers} = useContext(OutputContext)
 
+const SelectHeader = ({ table }: { table: any }) => {
     return (
         <Checkbox
             checked={
                 table.getIsAllPageRowsSelected() ||
                 (table.getIsSomePageRowsSelected() && "indeterminate")
             }
-            onCheckedChange={(Value) => {
-                table.toggleAllPageRowsSelected(!!Value);
-                setNumbers(!!Value
-                    ? table.getRowModel().rows.map((row: Row<OutPut>) => row.original.idOutputInk,
-                    console.log(numbers)
-                )
-                    : [])
-            }}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Seleccionar todos"
         />
     );
 };
 
 const SelectCell = ({ row }: { row: Row<OutPut> }) => {
-    const { numbers, toggleNumber } = useContext(OutputContext);
-
     return (
         <Checkbox
-            className="bg-[#e8e8e8]"
-            checked={
-                numbers.includes(row.original.idOutputInk)
-            }
-            onCheckedChange={() => {
-                toggleNumber(row.original.idOutputInk)
-            }}
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
             aria-label="Seleccionar fila"
         />
-    )
-}
+    );
+};
 
 export const columns: ColumnDef<OutPut>[] = [
     {
@@ -65,61 +56,251 @@ export const columns: ColumnDef<OutPut>[] = [
     },
     {
         accessorKey: 'idOutputInk',
-        header: 'ID',
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger><Button
+                        className='hover:bg-transparent bg-transparentmax-w-1/2 px-0'
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        ID
+                    </Button >
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordenar por ID
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'date',
-        header: 'Fecha',
+        header: ({ column }) => {
+            return (<Tooltip>
+                <TooltipTrigger>
+                    <Button
+                        className='hover:bg-transparent bg-transparent'
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    >
+                        Fecha
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent className='bg-gray-200 text-blue-900'>
+                    Ordenar po Fecha
+                </TooltipContent>
+            </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'production',
-        header: 'No. Producción',
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                            No. Produccion
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordenar por numero de orden de producción
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'idInk',
-        header: 'ID Tinta',
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        >
+                            Tinta ID
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Oredenar por Id de origen
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'typeMaterial',
-        header: 'Tipo de Material'
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button className='bg-transparent hover:bg-transparent'
+                            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        >
+                            Tipo
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordenar por Tipo de Material
+                    </TooltipContent>
+                </Tooltip>
+            )
+        }
     }, {
         accessorKey: 'internalBatch',
-        header: 'Lote Interno',
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        >
+                            Lote Interno
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordenar por Lote Interno
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'kilogramsRequired',
-        header: "Kg's Requeridos",
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => {
+                                column.toggleSorting(column.getIsSorted() === 'asc')
+                            }}
+                        >
+                            Kg's Requeridos
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordear: Mayor/Menor - Menor/Mayor
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'kilogramsDelivered',
-        header: "Kg's Entregados",
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => {
+                                column.toggleSorting(column.getIsSorted() === 'asc')
+                            }}
+                        >
+                            Kg's Entregados
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordear: Mayor/Menor - Menor/Mayor
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'whoDelivers',
-        header: 'Quien Entrega',
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => {
+                                column.toggleSorting(column.getIsSorted() === 'asc')
+                            }}
+                        >
+                            Quien Entrega
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordear alfabeticamente
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         accessorKey: 'whoReceives',
-        header: 'Quien Recibe',
-    },{
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => {
+                                column.toggleSorting(column.getIsSorted() === 'asc')
+                            }}
+                        >
+                            Quien Recibio
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordear alfabeticamente
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
+    }, {
         accessorKey: 'returnedKilogramsRequired',
-        header :"Kg's devueltos",
+        header: ({ column }) => {
+            return (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            className='bg-transparent hover:bg-transparent px-0'
+                            onClick={() => {
+                                column.toggleSorting(column.getIsSorted() === 'asc')
+                            }}
+                        >
+                            Kg's Devueltos
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className='bg-gray-200 text-blue-900'>
+                        Ordear: Mayor/Menor - Menor/Mayor
+                    </TooltipContent>
+                </Tooltip>
+            )
+        },
     }, {
         id: "actions",
-        cell: ({ row }) => <OutputActions row={row} />
+        cell: ({ row, table }) => <OutputActions row={row} table={table} />
     }
 ]
 
 type OutputActionsProps = {
     row: Row<OutPut>
+    table: Table<OutPut>
 }
 
-function OutputActions({ row }: OutputActionsProps) {
+function OutputActions({ row, table }: OutputActionsProps) {
 
     const { setOpen, numbers, setNumbers } = useContext(OutputContext)
 
     return (
-        <Button className="bg-[#4f4a4a]"
+        <Button className="bg-transparent hover:bg-transparent hover:text-white m-0 p-0 w-fit h-fit transition-colors"
             onClick={() => {
                 setOpen(true);
-                if (!numbers.includes(row.original.idOutputInk)) {
-                    setNumbers([...numbers, row.original.idOutputInk]);
+
+                const selectedIds = table
+                    .getSelectedRowModel()
+                    .rows.map(row => row.original.idInk);
+
+                setNumbers(selectedIds)
+                toast.info(`numbers:` + numbers)
+
+                if (!selectedIds.includes(row.original.idInk)) {
+                    selectedIds.push(row.original.idInk);
                 }
+                row.toggleSelected(true);
             }}
         >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.527 15.977h3.24c1.278-.021 3.233.652 3.233 3.08C22 21.577 19.588 22 18.766 22H7.946C5.438 22 2 21.491 2 17.17V8.002h20v4.517m-6.473 3.457a.8.8 0 0 1 .273-.58l1.702-1.42m-1.975 2a.8.8 0 0 0 .275.623l1.7 1.383M2.006 7.991l.921-2.3c.748-1.789 1.122-2.683 1.88-3.186S6.537 2 8.48 2h7.02c1.944 0 2.916 0 3.674.504c.758.503 1.131 1.397 1.88 3.185L22 7.995m-10.037.006v-6m-2 10h4" color="currentColor" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="black" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.527 15.977h3.24c1.278-.021 3.233.652 3.233 3.08C22 21.577 19.588 22 18.766 22H7.946C5.438 22 2 21.491 2 17.17V8.002h20v4.517m-6.473 3.457a.8.8 0 0 1 .273-.58l1.702-1.42m-1.975 2a.8.8 0 0 0 .275.623l1.7 1.383M2.006 7.991l.921-2.3c.748-1.789 1.122-2.683 1.88-3.186S6.537 2 8.48 2h7.02c1.944 0 2.916 0 3.674.504c.758.503 1.131 1.397 1.88 3.185L22 7.995m-10.037.006v-6m-2 10h4" color="currentColor" /></svg>
         </Button>
     )
 }

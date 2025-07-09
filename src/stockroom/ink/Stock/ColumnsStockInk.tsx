@@ -67,7 +67,7 @@ export const columns: ColumnDef<Stock>[] = [
             return (
                 <Tooltip>
                     <TooltipTrigger><Button
-                        className='hover:bg-transparent bg-transparentmax-w-1/2 px-0'
+                        className='hover:bg-transparent bg-transparent max-w-1/2 px-0'
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
                         ID
@@ -292,7 +292,7 @@ type StockActionProps = {
     table: Table<Stock>;
 }
 function StockAction({ row, table }: StockActionProps) {
-    const { setOpen, numbers, setNumbers } = useContext(StockContext);
+    const { setOpen, setNumbers } = useContext(StockContext);
 
     return (
 
@@ -330,8 +330,6 @@ function StockAction({ row, table }: StockActionProps) {
             <TooltipContent className='bg-gray-200 text-black'>
                 Requerida's para producción
             </TooltipContent>
-            
-
         </Tooltip>
         
     );

@@ -1,17 +1,21 @@
 import { DataTable } from './OutPutInksDataTable'
 import { columns } from './Columns'
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 const url = import.meta.env.VITE_API_URL
 import type { OutPut } from './Columns'
 import { toast } from 'sonner'
-import OutPutProvider from './OutputContext'
 import DialogForm from './DialogForm'
-
-
+import { OutputContext } from './OutputContext'
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
+import FilterOutputs from './FilterOutputs'
 
 export default function Outputs() {
-
+  const { refreshKey } = useContext(OutputContext)
   const [data, setData] = useState<OutPut[]>([])
   async function getOutputs() {
     await axios.get(`${url}/outputInks/findAll`)
@@ -37,16 +41,32 @@ export default function Outputs() {
 
   useEffect(() => {
     getOutputs();
-  }, [])
+    toast.info('Buscando información...')
+  }, [refreshKey])
 
   return (
-    <div>
-      <OutPutProvider>
-        <DataTable columns={columns} data={data} />
+    <div className=' mt-2 h-150 w-full items-start'>
+      <div className='flex flex-row w-full'>
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="rounded-md">
+          <ResizablePanel defaultSize={18}>
+            <div className="flex h-full items-center justify-center">
+
+              <FilterOutputs />
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={82} >
+            <div className="flex h-full items-start justify-center px-6">
+              <DataTable columns={columns} data={data} />
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
         <DialogForm>
           Children
         </DialogForm>
-      </OutPutProvider>
+      </div>
     </div>
   )
 }

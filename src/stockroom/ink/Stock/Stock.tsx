@@ -14,14 +14,44 @@ import {
 } from "@/components/ui/resizable"
 import { StockContext } from './StockContext'
 import { toast } from 'sonner'
-
-export default function DemoPage() {
+export default function Stock() {
     const [data, setData] = useState<Stock[]>([])
-    const {refreshKey} =useContext(StockContext)
+    const { refreshKey } = useContext(StockContext)
 
     async function getData() {
+        type Filters = {
+            provider?: number
+            providerBatch?: string
+            internalBatch?: string
+            type?: string
+            code?: string
+            remainingVolumeMin?: string
+            remainingVolumeMax?: string
+        }
+        let filters: Filters = {}
+        const storedFilters = localStorage.getItem('filters-stock')
+        if (storedFilters) {
+            try {
+                filters = JSON.parse(storedFilters)
+            } catch (err) {
+                console.error("No se pudieron cargar los filtros persistidos:", err)
+            }
+        }
+
         try {
-            const response = await axios.get(`${url}/ink/findInksWithStock`);
+            const response = await axios.get(`${url}/ink/findInksWithStock`, {
+                params: {
+                    idProvider: filters.provider ?? '',
+                    batchProvider: filters.providerBatch ?? '',
+                    internalBatch: filters.internalBatch ?? '',
+                    typeMaterial: filters.type ?? '',
+                    codeItem: filters.code ?? '',
+                    minRemaining: filters.remainingVolumeMin ?? '',
+                    maxRemaining: filters.remainingVolumeMax ?? ''
+                }
+            })
+            
+
             const data = response.data.map((ink: any) => ({
                 idInk: ink.id,
                 id_InInk: ink.idInInk,
@@ -33,43 +63,43 @@ export default function DemoPage() {
                 totalQuantityKilograms: ink.totalKilograms,
                 remainingVolume: ink.remainingKilograms,
                 volumeUsed: ink.usedKilograms,
-            }));
-            setData(data);
+            }))
+            setData(data)
         } catch (error) {
-            console.error("Error fetching data:", error);
+            console.error("Error fetching data:", error)
         }
     }
 
+
     useEffect(() => {
+                toast.info('Obteniendo información...')
         getData()
-        toast.info('obteniendo información...')
-    }, [refreshKey])
+        toast.info('Obteniendo información...' + refreshKey)
+    }, [refreshKey])    
 
     return (
         <div className=' mt-2 h-150 w-full items-start'>
-                <div className='flex flex-row w-full'>
-                    <ResizablePanelGroup
-                        direction="horizontal"
-                        className="rounded-md"
-                    >
-                        <ResizablePanel defaultSize={18}>
-                            <div className="flex h-full items-center justify-center">
-                                <FilterStock />
-                            </div>
-                        </ResizablePanel>
-                        <ResizableHandle withHandle />
-                        <ResizablePanel defaultSize={82}>
-                            <div className="flex h-full items-start justify-center px-6">
-                              
-                                <DataTable columns={columns} data={data} />
-                            </div>
-                        </ResizablePanel>
-                    </ResizablePanelGroup>
-                </div>
-                <GlobalDialog>
-                    <FormOutputInk />
-                </GlobalDialog>
-            
+            <div className='flex flex-row w-full'>
+                <ResizablePanelGroup
+                    direction="horizontal"
+                    className="rounded-md">
+                    <ResizablePanel defaultSize={18}>
+                        <div className="flex h-full items-center justify-center">
+                            <FilterStock />
+                        </div>
+                    </ResizablePanel>
+                    <ResizableHandle withHandle />
+                    <ResizablePanel defaultSize={82}>
+                        <div className="flex h-full items-start justify-center px-6">
+                            <DataTable columns={columns} data={data} />
+                        </div>
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            </div>
+            <GlobalDialog>
+                <FormOutputInk />
+            </GlobalDialog>
         </div>
     )
 }
+

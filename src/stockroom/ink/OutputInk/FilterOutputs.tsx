@@ -1,15 +1,15 @@
-import { useEffect, useState, useContext } from "react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Button } from "@/components/ui/button"
+import { useEffect, useContext, useState } from "react"
 import axios from "axios"
 const url = import.meta.env.VITE_API_URL;
-import { StockContext } from "./StockContext"
-import type { filterType } from "./StockContext"
+import { toast } from "sonner"
+import { useForm } from "react-hook-form";
+import { z } from "zod"
+import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,7 +24,6 @@ import {
   SelectValue,
   SelectGroup
 } from "@/components/ui/select"
-import { toast } from "sonner"
 
 const formSchema = z.object({
   provider: z.number().optional().nullable(),
@@ -36,59 +35,40 @@ const formSchema = z.object({
   remainingVolumeMax: z.number().optional().nullable()
 });
 
-export default function FilterStock() {
-  const [providers, setProviders] = useState<any[]>([])
-  const { setFilter } = useContext(StockContext)
-  useEffect(() => {
+export default function FilterOutputs() {const [providers, setProviders] = useState<any[]>([])
 
-    const storedFilters = localStorage.getItem('filters-stock')
-    if (storedFilters) {
-      try {
-        const parsed = JSON.parse(storedFilters)
-      } catch (err) {
-        console.error("No se pudieron cargar los filtros persistidos:", err)
-      }
-    } getProviders()
+  useEffect(() => {
+    getProviders()
   }, [])
 
   async function getProviders() {
-    axios.post(`${url}/provider/ProvidersByType`, "TINTA", {
-      headers: {
-        'Accept': '*/*',
-        'Content-Type': 'application/json'
-      }
+  axios.post(`${url}/provider/ProvidersByType`, "TINTA", {
+  headers: {
+    'Accept': '*/*',
+    'Content-Type': 'application/json'
+  }})
+    .then((response) =>{
+      setProviders(response.data)
     })
-      .then((response) => {
-        setProviders(response.data)
-      })
-      .catch((error) => {
-        toast.error(`Error: ${error}`)
-      })
+    .catch( (error) =>{
+      toast.error(`Error: ${error}`)
+    })
   }
 
   const filterForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+
     }
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    localStorage.setItem("filters-stock", JSON.stringify(values))
-    toast.info("Buscando...");
-    setFilter?.({
-      idProvider: values.provider ?? undefined,
-      batchProvider: values.providerBatch ?? "",
-      internalBatch: values.internalBatch ?? "",
-      typeMaterial: values.type ?? "",
-      codeItem: values.code ?? "",
-      minRemaining: values.remainingVolumeMin ?? undefined,
-      maxRemaining: values.remainingVolumeMax ?? undefined
-    } as filterType)
+    console.log(values)
   }
 
   return (
     <div className="w-md h-full px-5 py-10 min-w-50">
-
+      
       <h1 className=''><strong>FILTROS</strong></h1>
 
       <div className='px-2 py-3 grid grid-cols-1 gap-y-5'>
@@ -137,7 +117,7 @@ export default function FilterStock() {
                     <FormItem>
                       <FormLabel>Lote Proveedor: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Lote de Proveedor ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toUpperCase()) }} />
+                        <Input placeholder='Buscar por Lote de Proveedor ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toUpperCase()) }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -150,7 +130,7 @@ export default function FilterStock() {
                     <FormItem>
                       <FormLabel>Lote Interno: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Lote Interno' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
+                        <Input placeholder='Buscar por Lote Interno' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) =>{field.onChange(e.target.value.toLocaleUpperCase())}} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -163,7 +143,7 @@ export default function FilterStock() {
                     <FormItem>
                       <FormLabel>Tipo de Material: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Tipo de Material ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
+                        <Input placeholder='Buscar por Tipo de Material ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e)=>{field.onChange(e.target.value.toLocaleUpperCase())}} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -176,7 +156,7 @@ export default function FilterStock() {
                     <FormItem>
                       <FormLabel>Código: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Proveedor' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
+                        <Input placeholder='Buscar por Proveedor' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase())}}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -191,7 +171,7 @@ export default function FilterStock() {
                       <FormItem>
                         <FormLabel>Min: </FormLabel>
                         <FormControl>
-                          <Input placeholder='0' {...field} value={field.value ?? ''} type="number" className="w-5/6 bg-white" onChange={(e) => { field.onChange(e.target.valueAsNumber) }} />
+                          <Input placeholder='0' {...field} value={field.value ?? ''} type="number" className="w-5/6 bg-white" onChange={(e) => { field.onChange(e.target.valueAsNumber)}} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -212,7 +192,9 @@ export default function FilterStock() {
                   />
                 </div>
               </div>
-              <Button type='submit' className='bg-gradient-to-r from-blue-600 to-sky-800' >Aplicar</Button>
+              <Button type='submit' className='bg-gradient-to-r from-blue-600 to-sky-800' onClick={() => {
+                toast.info("Buscando...")
+              }}>Aplicar</Button>
             </div>
           </form>
         </Form>

@@ -9,6 +9,8 @@ export const OutputContext = createContext<{
     addNumber: (id: number) => void
     removeNumber:(id:number)=>void
     toggleNumber: (id:number) => void
+     refreshData: () => void
+    refreshKey: number
 }>({
     open:false,
     setOpen: () => {},
@@ -16,12 +18,16 @@ export const OutputContext = createContext<{
     setNumbers: () => {},
     addNumber: () => { },
     removeNumber: () => { },
-    toggleNumber: () => { }
+    toggleNumber: () => { },
+    refreshData: () => { },
+    refreshKey: 0
 })
 
 const OutPutProvider : FC <{children : ReactNode}> = ({ children }) =>{
     const [open,setOpen] = useState(false)
     const [numbers,setNumbers] = useState<number[]>([])
+     const [refreshKey, setRefreshKey] = useState(0)
+    const refreshData = () => setRefreshKey(prev => prev + 1)
 
     const addNumber = (id:number)=>{
         setNumbers( prev => prev.includes(id) ? prev : [...prev, id])
@@ -51,7 +57,9 @@ const OutPutProvider : FC <{children : ReactNode}> = ({ children }) =>{
             setNumbers,
             addNumber,
             toggleNumber,
-            removeNumber
+            removeNumber,
+            refreshData,
+            refreshKey
         }}
         >
             {children}

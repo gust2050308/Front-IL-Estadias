@@ -57,6 +57,7 @@ export default function () {
 
     async function getInfFromSelected() {
         try {
+            toast.info('numbers: ' + numbers)
             await axios.post(`${url}/outputInks/findToFormDevolucion`, numbers)
                 .then((response) => {
                     setDataFromApi(response.data)
@@ -111,7 +112,7 @@ export default function () {
         <div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <div>
+                    <div className='maxh-[400px] overflow-y-auto'>
                         <Table>
                             <TableHeader>
                                 <TableRow>

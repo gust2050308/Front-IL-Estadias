@@ -339,7 +339,7 @@ export default function ItemsDataForm() {
                                                             <Input
                                                                 {...field}
                                                                 onChange={(e) => {
-                                                                    handleFieldChange('invoiceRemission', index, e.target.value)
+                                                                    handleFieldChange('invoiceRemission', index, e.target.value.toLocaleUpperCase())
                                                                 }}
                                                             />
                                                         </FormControl>
@@ -358,7 +358,7 @@ export default function ItemsDataForm() {
                                                             <Input
                                                                 {...field}
                                                                 onChange={(e) => {
-                                                                    handleFieldChange('typeMaterial', index, e.target.value)
+                                                                    handleFieldChange('typeMaterial', index, e.target.value.toLocaleUpperCase())
                                                                 }}
                                                             />
                                                         </FormControl>
@@ -377,7 +377,7 @@ export default function ItemsDataForm() {
                                                             <Input
                                                                 {...field}
                                                                 onChange={(e) => {
-                                                                    handleFieldChange('batchProvider', index, e.target.value)
+                                                                    handleFieldChange('batchProvider', index, e.target.value.toLocaleUpperCase())
                                                                 }}
                                                             />
                                                         </FormControl>
@@ -396,7 +396,7 @@ export default function ItemsDataForm() {
                                                             <Input
                                                                 {...field}
                                                                 onChange={(e) => {
-                                                                    handleFieldChange('internalBatch', index, e.target.value)
+                                                                    handleFieldChange('internalBatch', index, e.target.value.toLocaleUpperCase( ))
                                                                 }}
                                                             />
                                                         </FormControl>
