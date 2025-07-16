@@ -27,8 +27,14 @@ import {
 import { toast } from "sonner"
 
 const formSchema = z.object({
-  provider: z.number().optional().nullable(),
-  providerBatch: z.string().optional().nullable(),
+  provider: z.preprocess(
+    (val) => {
+      if (val === "none" || val === "" || val == null) return null
+      const num = Number(val)
+      return isNaN(num) ? null : num
+    },
+    z.number().optional().nullable()
+  ), providerBatch: z.string().optional().nullable(),
   internalBatch: z.string().optional().nullable(),
   type: z.string().optional().nullable(),
   code: z.string().optional().nullable(),
@@ -38,17 +44,39 @@ const formSchema = z.object({
 
 export default function FilterStock() {
   const [providers, setProviders] = useState<any[]>([])
-  const { setFilter } = useContext(StockContext)
-  useEffect(() => {
+  const { setFilter, refreshData } = useContext(StockContext)
+  const [filter, setFilterState] = useState<filterType | undefined>(undefined)
 
+  const filterForm = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema) as any,
+    defaultValues: filter
+  })
+
+  useEffect(() => {
     const storedFilters = localStorage.getItem('filters-stock')
     if (storedFilters) {
       try {
         const parsed = JSON.parse(storedFilters)
+
+        filterForm.reset(parsed)
+
+        setFilterState(parsed as filterType)
+
+        setFilter?.({
+          idProvider: parsed.provider ?? undefined,
+          batchProvider: parsed.providerBatch ?? "",
+          internalBatch: parsed.internalBatch ?? "",
+          typeMaterial: parsed.type ?? "",
+          codeItem: parsed.code ?? "",
+          minRemaining: parsed.remainingVolumeMin ?? undefined,
+          maxRemaining: parsed.remainingVolumeMax ?? undefined
+        } as filterType)
       } catch (err) {
         console.error("No se pudieron cargar los filtros persistidos:", err)
       }
-    } getProviders()
+    }
+
+    getProviders()
   }, [])
 
   async function getProviders() {
@@ -66,12 +94,6 @@ export default function FilterStock() {
       })
   }
 
-  const filterForm = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-    }
-  })
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     localStorage.setItem("filters-stock", JSON.stringify(values))
     toast.info("Buscando...");
@@ -84,6 +106,7 @@ export default function FilterStock() {
       minRemaining: values.remainingVolumeMin ?? undefined,
       maxRemaining: values.remainingVolumeMax ?? undefined
     } as filterType)
+    refreshData()
   }
 
   return (
@@ -100,25 +123,25 @@ export default function FilterStock() {
                   control={filterForm.control}
                   name="provider"
                   render={({ field }) => (
-                    <FormItem className='w-auto' >
-                      <FormLabel>Proveedor: </FormLabel>
+                    <FormItem className='w-auto'>
+                      <FormLabel>Proveedor:</FormLabel>
                       <Select
-                        onValueChange={(value) => field.onChange(Number(value))} // Convertir a número
-                        value={field.value?.toString()} // Convertir a string para el Select
+                        key={field.value}
+                        onValueChange={(value) => field.onChange(value ? Number(value) : null)}
+                        value={field.value?.toString() ?? ""}
                       >
                         <FormControl>
-                          <SelectTrigger className='w-auto bg-white' >
-                            <SelectValue placeholder="Seleccionar proveedor">
-                              {providers.find(p => p.idProvider === field.value)?.providerName || "Seleccionar"}
-                            </SelectValue>
+                          <SelectTrigger className='w-auto bg-white'>
+                            <SelectValue placeholder="Seleccionar proveedor" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="max-h-60 overflow-y-auto">
                           <SelectGroup>
+                            <SelectItem value='none'>Ninguno</SelectItem>
                             {providers.map((provider) => (
                               <SelectItem
                                 key={provider.idProvider}
-                                value={provider.idProvider.toString()} // Convertir a string
+                                value={provider.idProvider.toString()}
                               >
                                 {provider.providerName}
                               </SelectItem>
@@ -130,6 +153,7 @@ export default function FilterStock() {
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={filterForm.control}
                   name="providerBatch"
@@ -183,7 +207,7 @@ export default function FilterStock() {
                   )}
                 />
                 <FormLabel>Kg's Restantes:</FormLabel>
-                <div className='grid-cols-2 gap-x-2 flex flex-row'>
+                <div className='grid-cols-2 gap-x-0 flex flex-row'>
                   <FormField
                     control={filterForm.control}
                     name='remainingVolumeMin'
@@ -212,14 +236,41 @@ export default function FilterStock() {
                   />
                 </div>
               </div>
-              <Button type='submit' className='bg-gradient-to-r from-blue-600 to-sky-800' >Aplicar</Button>
+              <div className='flex flex-row justify-between items-center'>
+                <Button type='submit' className='bg-gradient-to-r from-blue-600 to-sky-800 w-5/6 p-0 m-0' >Aplicar</Button>
+                <Button className='bg-gray-300 hover:bg-gray-400' onClick={() => {
+                  filterForm.reset({
+                    provider: null,
+                    providerBatch: null,
+                    internalBatch: null,
+                    type: null,
+                    code: null,
+                    remainingVolumeMin: null,
+                    remainingVolumeMax: null
+                  })
+                  localStorage.removeItem('filters-stock')
+                  setFilter?.({
+                    idProvider: undefined,
+                    batchProvider: "",
+                    internalBatch: "",
+                    typeMaterial: "",
+                    codeItem: "",
+                    minRemaining: undefined,
+                    maxRemaining: undefined
+                  } as filterType)
+                  refreshData()
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className='text-black hover:text-gray-900' width={32} height={32} viewBox="0 0 24 24"><g className="trash-outline"><g fill="currentColor" fillRule="evenodd" className="Vector" clipRule="evenodd"><path d="M4.917 6.003a1 1 0 0 1 1.08.914l.849 10.248A2 2 0 0 0 8.839 19h6.322a2 2 0 0 0 1.993-1.835l.85-10.248a1 1 0 0 1 1.993.166l-.85 10.247A4 4 0 0 1 15.162 21H8.84a4 4 0 0 1-3.987-3.67l-.85-10.247a1 1 0 0 1 .914-1.08"></path><path d="M3 7a1 1 0 0 1 1-1h16a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1m7 2a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1"></path><path d="M10.441 5a1 1 0 0 0-.948.684l-.544 1.632a1 1 0 1 1-1.898-.632l.544-1.633A3 3 0 0 1 10.441 3h3.117a3 3 0 0 1 2.846 2.051l.545 1.633a1 1 0 0 1-1.898.632l-.544-1.632A1 1 0 0 0 13.56 5h-3.117Z"></path></g></g></svg>
+                </Button>
+              </div>
             </div>
           </form>
-        </Form>
+        </Form>{/*
         <div className='w-full grid grid-cols-2 gap-2.5'>
           <Button className='bg-gradient-to-r from-red-950 to-stone-900 w-full'>PDF</Button>
           <Button className='bg-gradient-to-r from-emerald-950 to-stone-900 w-full'>XLSX</Button>
-        </div>
+        </div>*/}
+        
       </div>
     </div>
   )

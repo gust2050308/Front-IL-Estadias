@@ -1,15 +1,12 @@
-import StockProvider from './StockContext';
 import Stock from './Stock';
-import { DataTable } from './DataTableInksStock';
+import StockProvider from './StockContext';
 
-export default function StockContextProvider({ children }: { children: React.ReactNode }) {
-
-    return (
+export default function StockContextProvider() {
+  return (
+    <div>
         <StockProvider>
             <Stock />
-            {children}
-            {/* <GlobalDialog /> */}
-            {/* <FilterStock /> */}
         </StockProvider>
-    );
+    </div>
+  )
 }

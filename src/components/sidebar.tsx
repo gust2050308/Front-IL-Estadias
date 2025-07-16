@@ -96,7 +96,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                 {!collapsed && (
                     <CollapsibleContent className="pl-10 mt-1">
                         <button className="text-sm text-white hover:underline block py-1">
-                            <NavLink to="/Stock">Existencia</NavLink>
+                            <NavLink to="/StockContextProvider">Existencia</NavLink>
                         </button>
                         <button className="text-sm text-white hover:underline block py-1">
                             <NavLink to="/Outputs">Requeridas</NavLink>

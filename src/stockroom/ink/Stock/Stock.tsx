@@ -50,7 +50,7 @@ export default function Stock() {
                     maxRemaining: filters.remainingVolumeMax ?? ''
                 }
             })
-            
+
 
             const data = response.data.map((ink: any) => ({
                 idInk: ink.id,
@@ -65,6 +65,8 @@ export default function Stock() {
                 volumeUsed: ink.usedKilograms,
             }))
             setData(data)
+            console.log('Dtata obtenida:', data)
+
         } catch (error) {
             console.error("Error fetching data:", error)
         }
@@ -72,10 +74,10 @@ export default function Stock() {
 
 
     useEffect(() => {
-                toast.info('Obteniendo información...')
         getData()
-        toast.info('Obteniendo información...' + refreshKey)
-    }, [refreshKey])    
+        toast.info('Obteniendo información...')
+
+    }, [refreshKey])
 
     return (
         <div className=' mt-2 h-150 w-full items-start'>
@@ -102,4 +104,3 @@ export default function Stock() {
         </div>
     )
 }
-

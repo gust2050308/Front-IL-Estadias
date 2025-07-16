@@ -3,13 +3,13 @@ import type { ReactNode } from "react"
 import { toast } from "sonner"
 
 export type filterType = {
-    idProvider: number
+    idProvider: number | undefined
     batchProvider: string
     internalBatch: string
     typeMaterial: string
     codeItem: string
-    minRemaining: number
-    maxRemaining: number
+    minRemaining: number | undefined
+    maxRemaining: number | undefined
 }
 
 export const StockContext = createContext<{
@@ -17,9 +17,6 @@ export const StockContext = createContext<{
     setOpen: (open: boolean) => void
     numbers: number[]
     setNumbers: (numbers: number[]) => void
-    addNumber: (id: number) => void
-    removeNumber: (id: number) => void
-    toggleNumber: (id: number) => void // Sin el signo de interrogación
     refreshData: () => void
     refreshKey: number
     filter?: filterType
@@ -29,9 +26,6 @@ export const StockContext = createContext<{
     setOpen: () => { },
     numbers: [],
     setNumbers: () => { },
-    addNumber: () => { },
-    removeNumber: () => { },
-    toggleNumber: () => { },
     refreshData: () => { },
     refreshKey: 0
 })
@@ -45,24 +39,7 @@ const StockProvider: FC<{ children: ReactNode }> = ({ children }) => {
         toast.info('Actualizando datos...' + refreshKey)
     }
     const [filter, setFilter] = useState<filterType | undefined>(undefined)
-    const addNumber = (id: number) => {
-        setNumbers(prev =>
-            prev.includes(id) ? prev : [...prev, id]
-        )
-    }
-
-    const removeNumber = (id: number) => {
-        setNumbers(prev => prev.filter(n => n !== id))
-    }
-
-    const toggleNumber = (id: number) => {
-        setNumbers(prev =>
-            prev.includes(id)
-                ? prev.filter(n => n !== id)
-                : [...prev, id]
-        )
-    }
-
+  
     return (
         <StockContext.Provider
             value={{
@@ -70,9 +47,6 @@ const StockProvider: FC<{ children: ReactNode }> = ({ children }) => {
                 setOpen,
                 numbers,
                 setNumbers,
-                addNumber,
-                removeNumber,
-                toggleNumber,
                 refreshData,
                 refreshKey,
                 filter,
