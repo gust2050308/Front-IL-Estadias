@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, useFieldArray } from "react-hook-form"
+import { useForm, } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { StockContext } from "../Stock/StockContext"
 import {
@@ -44,7 +44,7 @@ const formSchema = z.object({
 
 export default function FormOutputInk() {
     const [isAlertOpen, setIsAlertOpen] = useState(false);
-    const { setOpen, numbers, setNumbers } = useContext(StockContext)
+    const { setOpen, numbers, setNumbers,refreshData } = useContext(StockContext)
     type TempDataType = {
         production: number;
         whoDelivers: string;
@@ -100,7 +100,6 @@ export default function FormOutputInk() {
             })),
         };
 
-        // Guarda los datos temporalmente si necesitas usarlos después
         setTempData(dataToSend);
         console.log("Datos a enviar:", tempData);
         setIsAlertOpen(true);
@@ -114,6 +113,7 @@ export default function FormOutputInk() {
                 setIsAlertOpen(false);
                 setOpen(false);
                 setNumbers([]);
+                refreshData();
             }
         } catch (error) {
             toast.error(`Error al enviar los datos: ${error}`);
@@ -250,41 +250,48 @@ export default function FormOutputInk() {
             <Drawer open={isAlertOpen} onOpenChange={setIsAlertOpen}>
                 <DrawerContent>
                     <DrawerHeader>
-                        <DrawerTitle>¿Estas completamentente seguro?</DrawerTitle>
+                        <DrawerTitle>¿¿ Estas completamentente seguro ??</DrawerTitle>
                         <DrawerDescription>Esta accion no se podra deshacer</DrawerDescription>
                     </DrawerHeader>
-                    <div className="p-4 pl-12 pr-12">
+                    <div className="px-50">
                         <p className="text-sm text-gray-700">Se enviaran los siguientes datos:</p>
-                        <Table className="mt-4">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-auto">id</TableHead>
-                                    <TableHead className="w-auto">Proveedor</TableHead>
-                                    <TableHead className="w-auto">Tipo de material</TableHead>
-                                    <TableHead className="w-auto">Kg's restantes</TableHead>
-                                    <TableHead className="w-auto">Kilos requeridos</TableHead>
-                                    <TableHead className="w-auto">Kilos entregados</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {tempData && tempData.inks.map((item, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell className="w-auto">{item.id}</TableCell>
-                                        <TableCell className="w-auto">{ApiData[index].provider}</TableCell>
-                                        <TableCell className="w-auto">{ApiData[index].typeMateria}</TableCell>
-                                        <TableCell className="w-auto">{ApiData[index].volumenRemaiming}</TableCell>
-                                        <TableCell className="w-auto">{item.kilogramsRequired}</TableCell>
-                                        <TableCell className="w-auto">{item.kilogramsDelivered}</TableCell>
+                        <div className='flex flex-row justify-between items-center mt-2'>
+                            <p className="text-sm text-gray-700"><strong>Orden de produccion: </strong>{tempData?.production}</p>
+                            <p className="text-sm text-gray-700"><strong>Quien entrega: </strong>{tempData?.whoDelivers}</p>
+                            <p className="text-sm text-gray-700"><strong>Quien recibe: </strong> {tempData?.whoReceives}</p>
+                        </div>
+                        <div className="mt-4 bg-gray-100 border-1 rounded-md border-gray-200 ">
+                            <Table>
+                                <TableHeader className='bg-slate-200'>
+                                    <TableRow>
+                                        <TableHead className="w-auto">id</TableHead>
+                                        <TableHead className="w-auto">Proveedor</TableHead>
+                                        <TableHead className="w-auto">Tipo de material</TableHead>
+                                        <TableHead className="w-auto">Kg's restantes</TableHead>
+                                        <TableHead className="w-auto">Kilos requeridos</TableHead>
+                                        <TableHead className="w-auto">Kilos entregados</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {tempData && tempData.inks.map((item, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="w-auto">{item.id}</TableCell>
+                                            <TableCell className="w-auto">{ApiData[index].provider}</TableCell>
+                                            <TableCell className="w-auto">{ApiData[index].typeMateria}</TableCell>
+                                            <TableCell className="w-auto">{ApiData[index].volumenRemaiming}</TableCell>
+                                            <TableCell className="w-auto">{item.kilogramsRequired}</TableCell>
+                                            <TableCell className="w-auto">{item.kilogramsDelivered}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
-                    <DrawerFooter>
-                        <Button onClick={handleConfirm}>Submit</Button>
+                    <DrawerFooter className='flex flex-row justify-between px-80'>
                         <DrawerClose>
-                            <Button variant="outline" onClick={() => { setIsAlertOpen(false) }}>Cancel</Button>
+                            <Button className='bg-gradient-to-r from-rose-600 to-rose-800' onClick={() => { setIsAlertOpen(false) }}>Cancelar</Button>
                         </DrawerClose>
+                        <Button className='bg-gradient-to-r from-green-600 to-green-800' onClick={handleConfirm}>Confirmar</Button>
                     </DrawerFooter>
                 </DrawerContent>
             </Drawer>

@@ -106,7 +106,7 @@ export default function () {
 
     useEffect(() => {
         getInfFromSelected()
-    }, [])
+    }, [numbers])
 
     return (
         <div>

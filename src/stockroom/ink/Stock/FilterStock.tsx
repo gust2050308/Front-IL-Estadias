@@ -96,7 +96,6 @@ export default function FilterStock() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     localStorage.setItem("filters-stock", JSON.stringify(values))
-    toast.info("Buscando...");
     setFilter?.({
       idProvider: values.provider ?? undefined,
       batchProvider: values.providerBatch ?? "",
@@ -237,7 +236,7 @@ export default function FilterStock() {
                 </div>
               </div>
               <div className='flex flex-row justify-between items-center'>
-                <Button type='submit' className='bg-gradient-to-r from-blue-600 to-sky-800 w-5/6 p-0 m-0' >Aplicar</Button>
+                <Button type='submit' className='bg-gradient-to-r from-blue-600 to-sky-800 w-5/6 p-0 m-0 hover:bg-blue-300' >Aplicar</Button>
                 <Button className='bg-gray-300 hover:bg-gray-400' onClick={() => {
                   filterForm.reset({
                     provider: null,
@@ -265,12 +264,7 @@ export default function FilterStock() {
               </div>
             </div>
           </form>
-        </Form>{/*
-        <div className='w-full grid grid-cols-2 gap-2.5'>
-          <Button className='bg-gradient-to-r from-red-950 to-stone-900 w-full'>PDF</Button>
-          <Button className='bg-gradient-to-r from-emerald-950 to-stone-900 w-full'>XLSX</Button>
-        </div>*/}
-        
+        </Form>        
       </div>
     </div>
   )

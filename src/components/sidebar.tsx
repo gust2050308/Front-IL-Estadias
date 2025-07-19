@@ -99,7 +99,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                             <NavLink to="/StockContextProvider">Existencia</NavLink>
                         </button>
                         <button className="text-sm text-white hover:underline block py-1">
-                            <NavLink to="/Outputs">Requeridas</NavLink>
+                            <NavLink to="/OutputContextProvider">Requeridas</NavLink>
                         </button>
                         <button className="text-sm text-white hover:underline block py-1">
                             <NavLink to="/InputsFromOrders">Agregar</NavLink>

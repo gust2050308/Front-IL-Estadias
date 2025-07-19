@@ -1,4 +1,3 @@
-"almacen"
 import type { ColumnDef, SortingState, ColumnFiltersState } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { flexRender, getCoreRowModel, useReactTable, getPaginationRowModel, getSortedRowModel, getFilteredRowModel, } from "@tanstack/react-table"
@@ -46,12 +45,14 @@ export function DataTable<TData, TValue>({
             row.original.idOutputInk.toString().toLowerCase().includes(search) ||
             row.original.date.toString().toLowerCase().includes(search) ||
             row.original.production.toString().toLowerCase().includes(search) ||
+            row.original.typeMaterial.toString().toLowerCase().includes(search) ||
+            row.original.internalBatch.toString().toLowerCase().includes(search) ||
             row.original.idInk.toString().toLowerCase().includes(search) ||
             row.original.kilogramsRequired.toString().toLowerCase().includes(search) ||
             row.original.kilogramsDelivered.toString().toLowerCase().includes(search) ||
             row.original.whoDelivers.toString().toLowerCase().includes(search) ||
             row.original.whoReceives.toString().toLowerCase().includes(search) ||
-            row.original.returnedKilogramsRequired.toStrnig().toLowerCase().includes(search)
+            row.original.returnedKilogramsRequired.toString().toLowerCase().includes(search)
           )
     }
 
@@ -147,7 +148,7 @@ export function DataTable<TData, TValue>({
                                         data-state={row.getIsSelected() && "selected"}
                                     >
                                         {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id} className='h-fit'>
+                                            <TableCell key={cell.id} className='h-12'>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </TableCell>
                                         ))}

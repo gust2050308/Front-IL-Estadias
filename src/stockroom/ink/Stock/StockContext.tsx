@@ -36,7 +36,6 @@ const StockProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [refreshKey, setRefreshKey] = useState(0)
     const refreshData = () => {
         setRefreshKey(prev => prev + 1)
-        toast.info('Actualizando datos...' + refreshKey)
     }
     const [filter, setFilter] = useState<filterType | undefined>(undefined)
   

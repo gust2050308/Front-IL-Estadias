@@ -283,24 +283,25 @@ function OutputActions({ row, table }: OutputActionsProps) {
     const { setOpen, numbers, setNumbers } = useContext(OutputContext)
 
     return (
-        <Button className="bg-transparent hover:bg-transparent hover:text-white m-0 p-0 w-fit h-fit transition-colors"
+        <Button className="bg-transparent hover:bg-transparent hover:text-white m-0 p-0 w-5 h-5 transition-colors"
+
             onClick={() => {
                 setOpen(true);
 
                 const selectedIds = table
                     .getSelectedRowModel()
-                    .rows.map(row => row.original.idInk);
+                    .rows.map(row => row.original.idOutputInk);
 
                 setNumbers(selectedIds)
-                toast.info(`numbers:` + numbers)
+                toast.info('Ids: ' + selectedIds)
 
-                if (!selectedIds.includes(row.original.idInk)) {
-                    selectedIds.push(row.original.idInk);
+                if (!selectedIds.includes(row.original.idOutputInk)) {
+                    selectedIds.push(row.original.idOutputInk);
                 }
                 row.toggleSelected(true);
             }}
         >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="black" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.527 15.977h3.24c1.278-.021 3.233.652 3.233 3.08C22 21.577 19.588 22 18.766 22H7.946C5.438 22 2 21.491 2 17.17V8.002h20v4.517m-6.473 3.457a.8.8 0 0 1 .273-.58l1.702-1.42m-1.975 2a.8.8 0 0 0 .275.623l1.7 1.383M2.006 7.991l.921-2.3c.748-1.789 1.122-2.683 1.88-3.186S6.537 2 8.48 2h7.02c1.944 0 2.916 0 3.674.504c.758.503 1.131 1.397 1.88 3.185L22 7.995m-10.037.006v-6m-2 10h4" color="currentColor" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={48} height={48} viewBox="0 0 24 24"><path fill="black" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.527 15.977h3.24c1.278-.021 3.233.652 3.233 3.08C22 21.577 19.588 22 18.766 22H7.946C5.438 22 2 21.491 2 17.17V8.002h20v4.517m-6.473 3.457a.8.8 0 0 1 .273-.58l1.702-1.42m-1.975 2a.8.8 0 0 0 .275.623l1.7 1.383M2.006 7.991l.921-2.3c.748-1.789 1.122-2.683 1.88-3.186S6.537 2 8.48 2h7.02c1.944 0 2.916 0 3.674.504c.758.503 1.131 1.397 1.88 3.185L22 7.995m-10.037.006v-6m-2 10h4" color="currentColor" /></svg>
         </Button>
     )
 }

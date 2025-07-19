@@ -16,44 +16,36 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Calendar } from "@/components/ui/calendar"
+
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup
-} from "@/components/ui/select"
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+
 
 const formSchema = z.object({
-  provider: z.number().optional().nullable(),
-  providerBatch: z.string().optional().nullable(),
-  internalBatch: z.string().optional().nullable(),
+  minRequestedDate: z.date().optional().nullable(),
+  maxRequestedDate: z.date().optional().nullable(),
+  inkId: z.number().optional().nullable(),
   type: z.string().optional().nullable(),
-  code: z.string().optional().nullable(),
-  remainingVolumeMin: z.number().optional().nullable(),
-  remainingVolumeMax: z.number().optional().nullable()
+  internalBatch: z.string().optional().nullable(),
+  minKgRequested: z.number().optional().nullable(),
+  maxKgRequested: z.number().optional().nullable(),
+  minKgDelivered: z.number().optional().nullable(),
+  maxKgDelivered: z.number().optional().nullable(),
+  whoDelivered: z.string().optional().nullable(),
+  WhoRecibed: z.string().optional().nullable(),
 });
 
-export default function FilterOutputs() {const [providers, setProviders] = useState<any[]>([])
+export default function FilterOutputs() {
 
   useEffect(() => {
-    getProviders()
   }, [])
-
-  async function getProviders() {
-  axios.post(`${url}/provider/ProvidersByType`, "TINTA", {
-  headers: {
-    'Accept': '*/*',
-    'Content-Type': 'application/json'
-  }})
-    .then((response) =>{
-      setProviders(response.data)
-    })
-    .catch( (error) =>{
-      toast.error(`Error: ${error}`)
-    })
-  }
 
   const filterForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,9 +58,11 @@ export default function FilterOutputs() {const [providers, setProviders] = useSt
     console.log(values)
   }
 
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  
   return (
     <div className="w-md h-full px-5 py-10 min-w-50">
-      
+
       <h1 className=''><strong>FILTROS</strong></h1>
 
       <div className='px-2 py-3 grid grid-cols-1 gap-y-5'>
@@ -76,40 +70,100 @@ export default function FilterOutputs() {const [providers, setProviders] = useSt
           <form onSubmit={filterForm.handleSubmit(onSubmit)}>
             <div className='grid grid-cols-1 gap-y-5'>
               <div className='grid grid-cols-1 gap-y-5'>
-                <FormField
-                  control={filterForm.control}
-                  name="provider"
-                  render={({ field }) => (
-                    <FormItem className='w-auto' >
-                      <FormLabel>Proveedor: </FormLabel>
-                      <Select
-                        onValueChange={(value) => field.onChange(Number(value))} // Convertir a número
-                        value={field.value?.toString()} // Convertir a string para el Select
-                      >
-                        <FormControl>
-                          <SelectTrigger className='w-auto bg-white' >
-                            <SelectValue placeholder="Seleccionar proveedor">
-                              {providers.find(p => p.idProvider === field.value)?.providerName || "Seleccionar"}
-                            </SelectValue>
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="max-h-60 overflow-y-auto">
-                          <SelectGroup>
-                            {providers.map((provider) => (
-                              <SelectItem
-                                key={provider.idProvider}
-                                value={provider.idProvider.toString()} // Convertir a string
-                              >
-                                {provider.providerName}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className='grid grid-cols-2 gap-x-2'>
+                  <FormField
+                    control={filterForm.control}
+                    name="minRequestedDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Fecha minima</FormLabel>
+                        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-[240px] pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                              onClick={() => setIsCalendarOpen(true)}
+                            >
+                              {field.value ? format(field.value, "PPP") : <span>Fecha</span>}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="z-[9999] w-auto p-0 bg-white" align="start">
+                            <div onClick={(e) => e.stopPropagation()}>
+
+                              <Calendar
+                                mode="single"
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    field.onChange(date)
+                                    setIsCalendarOpen(false)
+                                  }
+                                }}
+                                disabled={(date) =>
+                                  date < new Date(new Date().setHours(0, 0, 0, 0))
+                                }
+
+                                initialFocus
+                              />
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  /><FormField
+                    control={filterForm.control}
+                    name='maxRequestedDate'
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Fecha maxima</FormLabel>
+                        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-[240px] pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? format(field.value, "PPP") : <span>Selecciona una fecha</span>}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="z-[9999] w-auto p-0 bg-white" align="start">
+                            <div onClick={(e) => e.stopPropagation()}>
+
+                              <Calendar
+                                mode="single"
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    field.onChange(date)
+                                    setIsCalendarOpen(false)
+                                  }
+                                }}
+                                disabled={(date) =>
+                                  date < new Date(new Date().setHours(0, 0, 0, 0))
+                                }
+
+                                initialFocus
+                              />
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                </div>
+
                 <FormField
                   control={filterForm.control}
                   name="providerBatch"
@@ -117,7 +171,7 @@ export default function FilterOutputs() {const [providers, setProviders] = useSt
                     <FormItem>
                       <FormLabel>Lote Proveedor: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Lote de Proveedor ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toUpperCase()) }}/>
+                        <Input placeholder='Buscar por Lote de Proveedor ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toUpperCase()) }} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -130,7 +184,7 @@ export default function FilterOutputs() {const [providers, setProviders] = useSt
                     <FormItem>
                       <FormLabel>Lote Interno: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Lote Interno' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) =>{field.onChange(e.target.value.toLocaleUpperCase())}} />
+                        <Input placeholder='Buscar por Lote Interno' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -143,7 +197,7 @@ export default function FilterOutputs() {const [providers, setProviders] = useSt
                     <FormItem>
                       <FormLabel>Tipo de Material: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Tipo de Material ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e)=>{field.onChange(e.target.value.toLocaleUpperCase())}} />
+                        <Input placeholder='Buscar por Tipo de Material ' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -156,7 +210,7 @@ export default function FilterOutputs() {const [providers, setProviders] = useSt
                     <FormItem>
                       <FormLabel>Código: </FormLabel>
                       <FormControl>
-                        <Input placeholder='Buscar por Proveedor' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase())}}/>
+                        <Input placeholder='Buscar por Proveedor' {...field} value={field.value ?? ""} type="text" className="w-full bg-white" onChange={(e) => { field.onChange(e.target.value.toLocaleUpperCase()) }} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -171,7 +225,7 @@ export default function FilterOutputs() {const [providers, setProviders] = useSt
                       <FormItem>
                         <FormLabel>Min: </FormLabel>
                         <FormControl>
-                          <Input placeholder='0' {...field} value={field.value ?? ''} type="number" className="w-5/6 bg-white" onChange={(e) => { field.onChange(e.target.valueAsNumber)}} />
+                          <Input placeholder='0' {...field} value={field.value ?? ''} type="number" className="w-5/6 bg-white" onChange={(e) => { field.onChange(e.target.valueAsNumber) }} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

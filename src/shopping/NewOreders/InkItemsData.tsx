@@ -83,7 +83,6 @@ export default function InkItemsData() {
   async function getProviders() {
     try {
       const response = await axios.get(`${url}/provider`);
-      console.log("providers" + response.data)
       setProviders(response.data); // Asegúrate de que `setProviders` esté definido correctamente
     } catch (error) {
       console.error("Error fetching data:", error);

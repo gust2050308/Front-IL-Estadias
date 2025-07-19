@@ -7,15 +7,19 @@ import * as React from "react"
 import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "@/components/ui/DataTableViewOptions"
 import { StockContext } from "./StockContext"
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
+import {Pagination,PaginationContent,PaginationEllipsis,PaginationItem,PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import {
     Select,
@@ -24,6 +28,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu"
+import { StockPDFDocument } from "./StockPDFDocument"
+import { PDFDownloadLink } from "@react-pdf/renderer"
+import StockExcelExport from "./StockExcelExport"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -87,9 +95,36 @@ export function DataTable<TData, TValue>({
                     placeholder="Buscar..."
                     value={globalFilter}
                     onChange={(event) => setGlobalFilter(event.target.value)}
-                    className='bg-white w-2/5'
+                    className='bg-white w-2/4'
                 />
                 <div className='flex flex-row space-x-5'>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button className='rounded-s-sm bg-transparent hover:bg-zinc-100 px-0'>
+                                <svg xmlns="http://www.w3.org/2000/svg" className='text-black' width={24} height={24} viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth={1.5}><path strokeMiterlimit={10} d="M12 15.238V3.213"></path><path strokeLinejoin="round" d="m7.375 10.994l3.966 3.966a.937.937 0 0 0 1.318 0l3.966-3.966"></path><path strokeLinejoin="round" d="M2.75 13.85v4.625a2.313 2.313 0 0 0 2.313 2.313h13.874a2.313 2.313 0 0 0 2.313-2.313V13.85"></path></g></svg>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>
+                                Descargar...
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <PDFDownloadLink
+                                        document={<StockPDFDocument data={table.getFilteredRowModel().rows.map(r => r.original)} />}
+                                        fileName="reporte_stock.pdf"
+                                        style={{ textDecoration: "none", color: "inherit", display: "block", width: "100%" }}
+                                    >
+                                        {({ loading }) => (loading ? "Generando PDF..." : "PDF")}
+                                    </PDFDownloadLink>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <StockExcelExport data={table.getFilteredRowModel().rows.map(r => r.original)} />
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <Select
                         defaultValue=""
                         onValueChange={(value) => {
@@ -106,7 +141,7 @@ export function DataTable<TData, TValue>({
                             ))}
                         </SelectContent>
                     </Select>
-                    
+
                     <DataTableViewOptions table={table} />
                     <Button className='rounded-full w-fit h-auto bg-white hover:bg-zinc-100 px-0'
                         onClick={refreshData}
