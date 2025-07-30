@@ -4,7 +4,7 @@ import { StockPDFDocument } from './StockPDFDocument';
 
 export default function StockContextProvider() {
   return (
-    <div>
+    <div className='h-full w-full'>
         <StockProvider>
             <Stock />
         </StockProvider>

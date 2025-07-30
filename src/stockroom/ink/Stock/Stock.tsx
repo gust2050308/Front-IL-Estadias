@@ -56,6 +56,7 @@ export default function Stock() {
             remainingVolumeMin?: string
             remainingVolumeMax?: string
         }
+        
         let filters: Filters = {}
         const storedFilters = localStorage.getItem('filters-stock')
         if (storedFilters) {
@@ -120,7 +121,7 @@ export default function Stock() {
     }, [refreshKey])
 
     return (
-        <div className=' mt-2 h-150 w-full items-start'>
+        <div className='mt-2 h-150 w-full items-start'>
             <div className='flex flex-row w-full'>
                 <ResizablePanelGroup
                     direction="horizontal"
@@ -166,7 +167,7 @@ export default function Stock() {
                                     <Button variant={'ghost'}>
                                         <div className='flex flex-row items-center gap-2'>
                                             <p>
-                                                Mostrar existencias por tipo
+                                                Total de existencias por tipo
                                             </p>
                                             <ChevronsUpDown className='w-4 h-4' />
                                         </div>

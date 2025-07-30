@@ -15,7 +15,7 @@ export default function GeneralData() {
 
   return (
     <div style={{ marginTop: 100, flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Dialog modal={false} onOpenChange={setOpen} open={open}>
+      <Dialog onOpenChange={setOpen} open={open}>
         <DialogTrigger asChild>
           <button className="bg-black font-bold w-30 h-8 rounded-[10px] text-white flex justify-center items-center">
             <h1 className="m-1.5">Nueva</h1>

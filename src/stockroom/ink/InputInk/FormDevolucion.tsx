@@ -38,6 +38,7 @@ type findToFormDevolucion = {
     kilogramsDelivered: number
     whoDelivers: string
     whoReceives: string
+    returnedKilogramsRequired: number
 }
 
 const formSchema = z.object({
@@ -52,7 +53,7 @@ export default function () {
     const [dataFromApi, setDataFromApi] = useState<findToFormDevolucion[]>([])
     const [tempData, setTempData] = useState<any[]>([])
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-    const { numbers, setOpen, setNumbers } = useContext(OutputContext)
+    const { numbers, setOpen, setNumbers, refreshData } = useContext(OutputContext)
 
 
     async function getInfFromSelected() {
@@ -81,7 +82,7 @@ export default function () {
     function onSubmit(values: z.infer<typeof formSchema>) {
         const dataToSend = dataFromApi.map((item, index) => ({
             idOutputInk: item.idOutputInk,
-            devolutionQuantity: values.devolitionValue[0].devolutionQuantity
+            devolutionQuantity: values.devolitionValue[index].devolutionQuantity
         }))
         console.log("data to axios: " + dataToSend)
         setTempData(dataToSend)
@@ -98,6 +99,7 @@ export default function () {
                 setIsDrawerOpen(false);
                 setOpen(false);
                 setNumbers([]);
+                refreshData();
             }
         } catch (e) {
             toast.error("couldn't fetch data, error: " + e)
@@ -122,6 +124,7 @@ export default function () {
                                     <TableHead>Lote interno</TableHead>
                                     <TableHead>Quien Recibió</TableHead>
                                     <TableHead>Kg's Entregados</TableHead>
+                                    <TableHead>Kg's Devueltos</TableHead>
                                     <TableHead>Cantidad devolución</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -135,6 +138,7 @@ export default function () {
                                             <TableCell>{item.internalBatch}</TableCell>
                                             <TableCell>{item.whoReceives}</TableCell>
                                             <TableCell>{item.kilogramsDelivered}</TableCell>
+                                            <TableCell>{item.returnedKilogramsRequired}</TableCell>
                                             <TableCell>
                                                 <FormField
                                                     control={form.control}
@@ -147,7 +151,7 @@ export default function () {
                                                                     placeholder="0"
                                                                     step={0.001}
                                                                     min={0.001}
-                                                                    max={item.kilogramsDelivered}
+                                                                    max={item.kilogramsDelivered - item.returnedKilogramsRequired}
                                                                     {...field}
                                                                     onChange={(e) => { field.onChange(e.target.valueAsNumber) }}
                                                                 />
@@ -187,19 +191,20 @@ export default function () {
                                 </TableRow>
                             </TableHeader>
                             <TableBody className='bg-[#F7F7F7]'>
-                                {
-                                    tempData.map((item, index) => (
+                                {tempData.map((item, index) => {
+                                    const matching = dataFromApi.find(d => d.idOutputInk === item.idOutputInk);
+                                    return (
                                         <TableRow key={index}>
-                                            <TableCell className='w-auto'>{item.idOutputInk}</TableCell>
-                                            <TableCell className='w-auto'>{dataFromApi[index].date.substring(0,10)}</TableCell>
-                                            <TableCell className='w-auto'>{dataFromApi[index].typeMaterial}</TableCell>
-                                            <TableCell className='w-auto'>{dataFromApi[index].internalBatch}</TableCell>
-                                            <TableCell className='w-auto'>{dataFromApi[index].whoReceives}</TableCell>
-                                            <TableCell className='w-auto'>{dataFromApi[index].kilogramsRequired}</TableCell>
-                                            <TableCell className='w-auto'>{item.devolutionQuantity}</TableCell>
+                                            <TableCell>{item.idOutputInk}</TableCell>
+                                            <TableCell>{matching?.date?.substring(0, 10) || 'N/A'}</TableCell>
+                                            <TableCell>{matching?.typeMaterial || 'N/A'}</TableCell>
+                                            <TableCell>{matching?.internalBatch || 'N/A'}</TableCell>
+                                            <TableCell>{matching?.whoReceives || 'N/A'}</TableCell>
+                                            <TableCell>{matching?.kilogramsDelivered || 'N/A'}</TableCell>
+                                            <TableCell>{item.devolutionQuantity}</TableCell>
                                         </TableRow>
-                                    ))
-                                }
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </div>

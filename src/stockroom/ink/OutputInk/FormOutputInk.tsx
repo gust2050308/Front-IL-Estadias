@@ -260,7 +260,7 @@ export default function FormOutputInk() {
                             <p className="text-sm text-gray-700"><strong>Quien entrega: </strong>{tempData?.whoDelivers}</p>
                             <p className="text-sm text-gray-700"><strong>Quien recibe: </strong> {tempData?.whoReceives}</p>
                         </div>
-                        <div className="mt-4 bg-gray-100 border-1 rounded-md border-gray-200 ">
+                        <div className="mt-4 bg-gray-100 border-1 rounded-md border-gray-200 overflow-y-auto max-h-100">
                             <Table>
                                 <TableHeader className='bg-slate-200'>
                                     <TableRow>

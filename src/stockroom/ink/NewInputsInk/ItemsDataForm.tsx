@@ -24,6 +24,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 
+import type { InkItem } from './MainForm'
+
 const itemSchema = z.object({
     unitsArrived: z.number().min(1, "Al menos 1 unidad"),
     invoiceRemission: z.string().min(1, "El campo es requerido"),
@@ -39,26 +41,19 @@ const formSchema = z.object({
     inkItems: z.array(itemSchema)
 })
 
-type InkItem = {
-    idItemOrder: number
-    unitsQuantity: number
-    amountKilograms: number
-    codeItem: string
-}
+export default function ItemsDataForm({ inkItems }: { inkItems: InkItem[] }) {
+    const { orderData, setOpen, setSelectedOrder, setOrderData } = useContext(TableFormContext)
 
-export default function ItemsDataForm() {
-    const { orderData, setOpen } = useContext(TableFormContext)
     const [itemsOrder, setItemsOrder] = useState<InkItem[]>([])
     const [visibleIndexes, setVisibleIndexes] = useState<number[]>([])
     const [nextGroupId, setNextGroupId] = useState(1)
     const [filteredData, setFilteredData] = useState<InkItem[]>([])
     const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
 
-
     useEffect(() => {
-        if (orderData?.inkItems) {
-            setItemsOrder(orderData.inkItems)
-            const defaultFormValues = orderData.inkItems.map(() => ({
+        if (orderData) {
+            setItemsOrder(inkItems)
+            const defaultFormValues = inkItems.map(() => ({
                 unitsArrived: 0,
                 invoiceRemission: '',
                 typeMaterial: '',
@@ -69,7 +64,7 @@ export default function ItemsDataForm() {
                 syncGroup: 0
             }))
             form.reset({ inkItems: defaultFormValues })
-            setVisibleIndexes(orderData.inkItems.map((_: InkItem, idx: number) => idx))
+            setVisibleIndexes(inkItems.map((_: InkItem, idx: number) => idx))
         }
     }, [orderData])
 
@@ -228,6 +223,8 @@ export default function ItemsDataForm() {
                 setOpen(false);
                 setItemsOrder([]);
                 setVisibleIndexes([]);
+                setSelectedOrder(0)
+                setOrderData(null)
                 form.reset();
                 toast.success("Datos enviados correctamente");
             }
@@ -270,7 +267,7 @@ export default function ItemsDataForm() {
                                             </TooltipContent>
                                         </Tooltip>
                                     </TableHead>
-                                    <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Unidades solicitadas</TableHead>
+                                    <TableHead>Stock / Solicitado</TableHead>
                                     <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Unidades Entrantes</TableHead>
                                     <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Cantidad(Kg)</TableHead>
                                     <TableHead className="sticky top-0 z-10 px-4 py-2 border-b">Código</TableHead>
@@ -305,7 +302,7 @@ export default function ItemsDataForm() {
                                                 )}
                                             />
                                         </TableCell>
-                                        <TableCell>{itemsOrder[index]?.unitsQuantity}</TableCell>
+                                        <TableCell>{`${itemsOrder[index]?.totalUnitsQuantityArrived}/${itemsOrder[index]?.unitsQuantity} `}</TableCell>
                                         <TableCell>
                                             <FormField
                                                 control={control}
@@ -396,7 +393,7 @@ export default function ItemsDataForm() {
                                                             <Input
                                                                 {...field}
                                                                 onChange={(e) => {
-                                                                    handleFieldChange('internalBatch', index, e.target.value.toLocaleUpperCase( ))
+                                                                    handleFieldChange('internalBatch', index, e.target.value.toLocaleUpperCase())
                                                                 }}
                                                             />
                                                         </FormControl>

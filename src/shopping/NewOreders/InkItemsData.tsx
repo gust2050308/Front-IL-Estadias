@@ -180,7 +180,6 @@ export default function InkItemsData() {
 
   const { control, handleSubmit, register, formState: { errors } } = form;
 
-
   const { fields, append, remove } = useFieldArray({
     name: "inkItems",
     control,

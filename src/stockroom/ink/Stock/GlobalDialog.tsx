@@ -19,7 +19,7 @@ export function GlobalDialog({ children }: GlobalDialogProps) {
   const { open, setOpen, numbers } = useContext(StockContext)
 
   return (
-    <Dialog modal={false} open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-400" style={{ width: "80%" }}>
         <DialogHeader>
           <DialogTitle>Tinta requerida para produccion</DialogTitle>

@@ -5,28 +5,19 @@ import ItemsDataForm from './ItemsDataForm'
 const url = import.meta.env.VITE_API_URL;
 
 
-type InkItem = {
+export type InkItem = {
     idItemOrder: number;
     unitsQuantity: number;
     amountKilograms: number;
     codeItem: string;
+    totalUnitsQuantityArrived: number;
     isSatisfied: boolean;
-    ink: any | null; // puedes reemplazar `any` si tienes un modelo para `ink`
-};
-
-type Provider = {
-    id_Provider: number;
-    provider_Email: string;
-    provider_Person: string;
-    provider_Phone: string;
-    provider_Name: string;
-    provider_Address: string;
 };
 
 type OrderData = {
     id_PurchaseOrder: number;
     purchaseOrderNumber: number;
-    provider: Provider;
+    providerName: string;
     requestDate: string;
     deliveryDateExpected: string;
     dateDelivered: string | null;
@@ -43,14 +34,28 @@ type OrderData = {
 
 export default function MainForm({children}: {children: React.ReactNode}) {
     const [orderDataApi, setOrderDataApi] = useState<OrderData | null>(null);
-    const { selectedRow } = useContext(TableFormContext);
+    const { selectedOrder } = useContext(TableFormContext);
     const { setOrderData } = useContext(TableFormContext)!;
+    const [itemsFromApi,setitemsFromApi] = useState<InkItem[]>([])
+    
+    function getItems(){
+            try{
+                axios.get(`${url}/PurchaseOrder/ItemsByOrderNumber/${selectedOrder}`)
+                .then((response) => {
+                    if (response.status === 200){
+                        setitemsFromApi(response.data)
+                    }
+                })
+            } catch (error){
+                console.log('Noup' , error)
+            }
+        }
 
     const [itemsOrder, setItemsOrder] = useState([])
 
     async function getDataOrder() {
         try {
-            const response = await axios.get(`${url}/PurchaseOrder/findItemsInsatisfied/${selectedRow.orderNumber}`)
+            const response = await axios.get(`${url}/PurchaseOrder/findItemsInsatisfied/${selectedOrder}`)
             setOrderDataApi(response.data)
             setItemsOrder(response.data.inkItems)
             setOrderData(response.data);
@@ -60,10 +65,11 @@ export default function MainForm({children}: {children: React.ReactNode}) {
     }
 
     useEffect(() => {
-        if (selectedRow?.orderNumber) {
+        if (selectedOrder) {
             getDataOrder()
+            getItems()
         }
-    }, [selectedRow?.orderNumber])
+    }, [selectedOrder])
 
     return (
         <div>
@@ -72,7 +78,7 @@ export default function MainForm({children}: {children: React.ReactNode}) {
                     <div className="flex flex-row justify-between gap-6 my-2">
                         <div className='flex flex-col space-y-2'>
                             <p><strong>No. de orden: </strong>{orderDataApi.purchaseOrderNumber}</p>
-                            <p><strong>Proveedor: </strong>{orderDataApi.provider.provider_Name}</p>
+                            <p><strong>Proveedor: </strong>{orderDataApi.providerName}</p>
                             <p><strong>Fecha de solicitud: </strong>{orderDataApi.requestDate?.substring(0, 10)}</p>
                             <p><strong>Fecha esperada de entraga: </strong>{orderDataApi.deliveryDateExpected?.substring(0, 10)}</p>
                         </div>
@@ -83,7 +89,7 @@ export default function MainForm({children}: {children: React.ReactNode}) {
                             <p className=' overflow-auto break-words'><strong>Lugar de entrega: </strong>{orderDataApi.deliveryPlace}</p>
                         </div>
                     </div>
-                    <ItemsDataForm />
+                    <ItemsDataForm inkItems={itemsFromApi}/>
                 </div>
             )}
         </div>

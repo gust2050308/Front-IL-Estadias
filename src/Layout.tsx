@@ -13,20 +13,20 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="h-screen w-full flex flex-col bg-gradient-to-r from-[#f5f5f5] to-gray-200">
+    <div className=" w-full flex flex-col bg-gradient-to-r from-[#f5f5f5] to-gray-200">
       <Toaster richColors />
-                    <Navbar />
+      <Navbar/>
 
-      <SidebarProvider defaultOpen={false} style={{
+      <SidebarProvider className='fixed top-16 bg-gray-100 w-screen' defaultOpen={false} style={{
         // @ts-expect-error: Allow custom CSS variables
-        "--sidebar-width": "25rem",
-        "--sidebar-width-mobile": "20rem",
+        "--sidebar-width": "30rem",
+        "--sidebar-width-mobile": "30rem",
       }}>
 
         <Sidebar />
 
-        <main className='pt-3 h-full w-full'>
-          <Outlet />
+        <main className='pt-3 h-full w-full bg-gray-100'>
+          <Outlet/>
         </main>
       </SidebarProvider>
 

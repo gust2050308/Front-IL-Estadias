@@ -25,9 +25,9 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
-import { format, min } from "date-fns"
-import type { filterType } from "./OutputContext";
-import { OutputContext } from "./OutputContext";
+import { format } from "date-fns"
+import type { filterType } from "./TableInputContext";
+import { TableFormContext } from "./TableInputContext";
 
 const formSchema = z.object({
   minRequestedDate: z.date().optional().nullable(),
@@ -43,8 +43,8 @@ const formSchema = z.object({
   WhoRecibed: z.string().optional().nullable(),
 });
 
-export default function FilterOutputs() {
-  const { setFilter, refreshData } = useContext(OutputContext);
+export default function Filter() {
+  const { setFilter, refreshData } = useContext(TableFormContext);
   useEffect(() => {
     const storedFilter = localStorage.getItem("filterOutputs");
     if (storedFilter) {

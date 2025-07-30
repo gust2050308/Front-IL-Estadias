@@ -4,64 +4,142 @@ import { useContext } from "react"
 import { Button } from '@/components/ui/button'
 
 export type PurchaseOrder = {
-  orderNumber: number
-  provider: string
+  purchaseOrderNumber: number
+  providerName: string
   requestDate: string
   deliveryDateExpected: string
   requiredBy: string
   paymentMethod: string
   shipment: string
   deliveryPlace: string
-  itemsNumber: number
+  totalItems: number
+  itemsArrived: number
 }
-
 export const columns: ColumnDef<PurchaseOrder>[] = [
   {
-    accessorKey: 'orderNumber',
-    header: 'No. Orden'
-  }, {
-    accessorKey: 'provider',
-    header: 'Proveedor'
-  }, {
-    accessorKey: 'requestDate',
-    header: 'Fecha de Solicitud'
-  }, {
-    accessorKey: 'deliveryDateExpected',
-    header: 'Fecha Esperada'
-  }, {
-    accessorKey: 'requiredBy',
-    header: 'Requerido por'
-  }, {
-    accessorKey: 'paymentMethod',
-    header: 'Método de pago'
-  }, {
-    accessorKey: 'shipment',
-    header: 'Embarque'
-  }, {
-    accessorKey: 'deliveryPlace',
-    header: 'Lugar de entrega'
-  }, {
-    accessorKey: 'itemsNumber',
-    header: 'No. de ítems'
-  }, {
-    id: "userActions",
-    cell: ({ row }) => <VerItemsButton row={row} />
+    accessorKey: 'purchaseOrderNumber',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0 text-center" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        No. Orden
+      </div>
+    ),
+    cell: ({ row }) => {
+      return(
+        <div className='w-full text-center'>
+          {row.original.purchaseOrderNumber}
+        </div>
+      )
+    },
+    enableSorting: true,
   },
-]
+  {
+    accessorKey: 'providerName',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Proveedor
+      </div>
+    ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'requestDate',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Fecha de Solicitud
+      </div>
+    ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'deliveryDateExpected',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Fecha Esperada
+      </div>
+    ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'requiredBy',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Requerido por
+      </div>
+    ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'paymentMethod',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Método de pago
+      </div>
+    ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'shipment',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Embarque
+      </div>
+    ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'deliveryPlace',
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Lugar de entrega
+      </div>
+    ),
+    enableSorting: true,
+  },
+  {
+    id: 'itemsRatio',
+    accessorFn: row => row.totalItems === 0 ? 0 : row.itemsArrived / row.totalItems,
+    header: ({ column }) => (
+      <div className="cursor-pointer px-0" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        No. de ítems
+      </div>
+    ),
+    cell: ({ row }) => {
+      const { itemsArrived, totalItems } = row.original;
+      const complete = itemsArrived === totalItems;
+      const ratio = totalItems === 0 ? 0 : (itemsArrived / totalItems) * 100;
+      return (
+        <div className="text-center font-medium">
+          <div className='w-3/4 bg-blue-200 rounded-sm'>
+            <span className='text-blue-700'>
+              {`${itemsArrived}/${totalItems}`} ({Math.round(ratio)}%)
+            </span>
+          </div>
+        </div>
+      );
+    },
+    enableSorting: true,
+  },
+  {
+    id: "userActions",
+    cell: ({ row }) => <VerItemsButton row={row} />,
+    enableSorting: false, // No se ordenan acciones
+  },
+];
+
 
 type VerItemsButtonProps = {
   row: Row<PurchaseOrder>
 }
 
 function VerItemsButton({ row }: VerItemsButtonProps) {
-  const { setOpen, setSelectedRow } = useContext(TableFormContext)
+  const { setOpen, setSelectedOrder, selectedOrder } = useContext(TableFormContext)
 
   return (
     <Button
       onClick={() => {
-        setSelectedRow(row.original)
+        setSelectedOrder(row.original.purchaseOrderNumber)
+        console.log(selectedOrder)
         setOpen(true)
-        console.log("row.original", row.original)
       }}
       className="bg-[#807B7B] font-bold w-auto h-8 rounded-[10px] text-white flex justify-center items-center"
     >

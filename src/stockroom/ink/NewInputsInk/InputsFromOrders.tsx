@@ -5,11 +5,13 @@ import { useEffect, useState } from "react"
 const url = import.meta.env.VITE_API_URL
 import type { PurchaseOrder } from './Columns'
 
-import TableFormProvider from './TableInputContext'
+import TableFormContext from './TableInputContext'
 
-import { GlobalDialog } from "./GlobalDialog"
-import MainForm from './MainForm'
-import ItemsDataForm from "./ItemsDataForm"
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
 
 
 export default function InputsFromOrders() {
@@ -20,15 +22,16 @@ export default function InputsFromOrders() {
     await axios.get(`${url}/PurchaseOrder/findIncompleteOrdersInk`)
       .then((response) => {
         const datos = response.data.map((order: any) => ({
-          orderNumber: order.purchaseOrderNumber,
-          provider: order.provider.providerName,
+          purchaseOrderNumber: order.purchaseOrderNumber,
+          providerName: order.providerName,
           requestDate: order.requestDate.substring(0, 10),
           deliveryDateExpected: order.deliveryDateExpected.substring(0, 10),
           requiredBy: order.requiredBy,
           paymentMethod: order.paymentMethod,
           shipment: order.shipment,
           deliveryPlace: order.deliveryPlace,
-          itemsNumber: order.inkItems.length
+          totalItems: order.totalItems,
+          itemsArrived: order.itemsArrived
         }));
         setData(datos)
       }, (error) => {
@@ -42,15 +45,16 @@ export default function InputsFromOrders() {
 
   return (
     <div>
-      <TableFormProvider>
-        
-        <DataTable columns={columns} data={data} />
-        <GlobalDialog>
-          <MainForm>
-            <ItemsDataForm />
-          </MainForm>
-        </GlobalDialog>
-      </TableFormProvider>
+      <ResizablePanelGroup direction='horizontal'>
+        <ResizablePanel defaultSize={18}>
+
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={82}>
+          <DataTable columns={columns} data={data} />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
     </div>
   )
 }

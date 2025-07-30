@@ -3,8 +3,9 @@ import Layout from './Layout';
 import HomeShopping from './shopping/HomeShopping';
 import StockContextProvider from './stockroom/ink/Stock/StockContextProvider';
 import EntriesInk from './stockroom/ink/InputInk/EntriesInk';
-import InputsFromOrders from './stockroom/ink/NewInputsInk/InputsFromOrders';
+import NewInputsProvider from './stockroom/ink/NewInputsInk/NewInputsProvider';
 import OutputContextProvider from './stockroom/ink/OutputInk/OutputContextProvider';
+import ContextProvider from './shopping/Providers/ContextProvider'
 
 export default function App() {
   return (
@@ -15,7 +16,8 @@ export default function App() {
         <Route path="/StockContextProvider" element={<StockContextProvider />} />
         <Route path="/OutputContextProvider" element={<OutputContextProvider />} />
         <Route path="/EntriesInk" element={<EntriesInk />} />
-        <Route path="/InputsFromOrders" element={<InputsFromOrders />} />
+        <Route path="/NewInputsProvider" element={<NewInputsProvider />} />
+        <Route path='/ContextProvider' element={<ContextProvider/>} />
       </Route>
     </Routes>
   );

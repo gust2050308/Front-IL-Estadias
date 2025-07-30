@@ -102,9 +102,9 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                             <NavLink to="/OutputContextProvider">Requeridas</NavLink>
                         </button>
                         <button className="text-sm text-white hover:underline block py-1">
-                            <NavLink to="/InputsFromOrders">Agregar</NavLink>
+                            <NavLink to='/NewInputsProvider'>Agregar</NavLink>
                         </button>
-                         <button className="text-sm text-white hover:underline block py-1">
+                        <button className="text-sm text-white hover:underline block py-1">
                             <NavLink to="/EntriesInk">Entradas</NavLink>
                         </button>
                     </CollapsibleContent>
@@ -132,7 +132,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                 {!collapsed && (
                     <CollapsibleContent className="pl-10 mt-1">
                         <button className="text-sm text-white hover:underline block py-1">
-                            Subitem 1
+                            item
                         </button>
                         <button className="text-sm text-white hover:underline block py-1">
                             Subitem 2
@@ -152,7 +152,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                     >
                         <div className="flex items-center gap-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24"><path fill="currentColor" d="m22.903 11.728l-4.528-1.697V4.945a1.69 1.69 0 0 0-1.097-1.58l-4.687-1.757a1.67 1.67 0 0 0-1.186 0L6.717 3.366a1.69 1.69 0 0 0-1.097 1.58v5.085l-4.528 1.697A1.69 1.69 0 0 0 0 13.308v5.16c0 .638.36 1.224.933 1.51l4.687 2.344a1.68 1.68 0 0 0 1.51 0L12 19.884l4.87 2.438a1.68 1.68 0 0 0 1.51 0l4.687-2.344a1.69 1.69 0 0 0 .933-1.51v-5.16c0-.703-.436-1.331-1.097-1.58m-6.122-1.66l-3.984 1.496V8.367l3.984-1.734zM7.22 4.88L12 3.09l4.781 1.79v.028L12 6.848l-4.781-1.94Zm3.937 13.645l-3.984 1.992V16.81l3.984-1.818zm0-5.25l-4.781 1.94l-4.781-1.94v-.028l4.781-1.79l4.781 1.79zm11.25 5.25l-3.984 1.992V16.81l3.984-1.818zm0-5.25l-4.781 1.94l-4.781-1.94v-.028l4.781-1.79l4.781 1.79z"></path></svg>
-                                                    {!collapsed && <span>Auxiliares</span>}
+                            {!collapsed && <span>Auxiliares</span>}
 
                         </div>
                         {!collapsed && <ChevronDown className="w-4 h-4 ml-auto" />}
@@ -163,7 +163,7 @@ function SidebarContent({ collapsed }: { collapsed: boolean }) {
                 {!collapsed && (
                     <CollapsibleContent className="pl-10 mt-1">
                         <button className="text-sm text-white hover:underline block py-1">
-                            Subitem 1
+                            <NavLink to="/ContextProvider">Providers</NavLink>
                         </button>
                         <button className="text-sm text-white hover:underline block py-1">
                             Subitem 2

@@ -9,16 +9,17 @@ import {
 import { Button } from "@/components/ui/button"
 import MainForm from "./MainForm"
 import type { ReactNode } from "react"
+import { Flashlight } from "lucide-react"
 
 type GlobalDialogProps = {
   children: ReactNode
 }
 
 export function GlobalDialog({ children }: GlobalDialogProps) {
-  const { open, setOpen, selectedRow } = useContext(TableFormContext)
+  const { open, setOpen, selectedOrder } = useContext(TableFormContext)
 
   return (
-    <Dialog modal={false} open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-400" style={{ width: "80%" }}>
         <DialogHeader>
           <DialogTitle>Registrar items de orden de compra</DialogTitle>
@@ -28,7 +29,7 @@ export function GlobalDialog({ children }: GlobalDialogProps) {
         </DialogHeader>
 
         <div className="mt-2 space-y-2">
-          {selectedRow && (
+          {selectedOrder && (
             <div>
               <MainForm>
                 {children}

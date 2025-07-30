@@ -8,7 +8,6 @@ export default function OutputContextProvider() {
         <OutPutProvider>
             <Outputs />
         </OutPutProvider>
-      
     </div>
   )
 }
